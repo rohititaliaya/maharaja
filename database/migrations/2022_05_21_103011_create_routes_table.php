@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('routes', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('bus_id');
+            $table->foreign('bus_id')->references('id')->on('buses');
+            $table->unsignedBigInteger('from');
+            $table->foreign('from')->references('id')->on('cities');
+            $table->unsignedBigInteger('to');
+            $table->foreign('to')->references('id')->on('cities');
+            $table->integer('price');
+            $table->enum('status',['A','D'])->default('A');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('routes');
+    }
+};
