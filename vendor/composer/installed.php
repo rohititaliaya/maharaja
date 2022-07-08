@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'b922c073f7117ac81e70cc3c167cde99a3e261c3',
+        'reference' => '044f5081d2712e1a6fcb886556b5286dd81dfcfd',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -24,15 +24,6 @@
             'replaced' => array(
                 0 => '*',
             ),
-        ),
-        'daftspunk/laravel-config-writer' => array(
-            'pretty_version' => 'v1.1',
-            'version' => '1.1.0.0',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../daftspunk/laravel-config-writer',
-            'aliases' => array(),
-            'reference' => 'ad45d05fcadc3488d2e2bd40772f54cd3189877b',
-            'dev_requirement' => false,
         ),
         'davedevelopment/hamcrest-php' => array(
             'dev_requirement' => true,
@@ -397,7 +388,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'b922c073f7117ac81e70cc3c167cde99a3e261c3',
+            'reference' => '044f5081d2712e1a6fcb886556b5286dd81dfcfd',
             'dev_requirement' => false,
         ),
         'laravel/sail' => array(

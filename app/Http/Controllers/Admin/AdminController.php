@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AdminPolicy;
-
+use App\Models\Setting;
 
 class AdminController extends Controller
 {
@@ -44,24 +44,29 @@ class AdminController extends Controller
 
     public function privacy()
     {
-        $admin = config('AdminPolicy.id');
+        $set = Setting::find(1);
+        $m = json_decode($set->values);
         $array = [
-            'email' => config('AdminPolicy.email'),
-            'mobile' => config('AdminPolicy.mobile'),
-            'privacy_policy'=>config('AdminPolicy.privacy_policy')
+            'email' => $m->email,
+            'mobile' => $m->mobile,
+            'privacy_policy'=> $m->privacy_policy,
+            'razorpay_apikey'=> $m->razorpay_apikey,
         ];
         return $array;
     }
     public function getPolicy(Request $request)
     {
-        return view('policy.policy');
+        $sets = Setting::find(1);
+        $set = json_decode($sets->values);
+        return view('policy.policy',['setting' => $set]);
     }
 
     public function privacyPolicy(Request $request)
     {
-        $email = $request->email;
-        $array = config('AdminPolicy');
-        $array['email'] = $email;
+        $set = Setting::find(1);
+        $set->type = 'policy';
+        $set->values = json_encode($request->toArray());
+        $set->save();
         return redirect()->back()->with('success', 'Updated successfully !');
     }
     /**

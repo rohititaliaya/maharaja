@@ -108,10 +108,6 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
             'PhpParser\\' => 10,
             'PhpOption\\' => 10,
         ),
-        'O' => 
-        array (
-            'October\\Rain\\Config\\' => 20,
-        ),
         'N' => 
         array (
             'NunoMaduro\\Collision\\' => 21,
@@ -378,10 +374,6 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
-        'October\\Rain\\Config\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src',
-        ),
         'NunoMaduro\\Collision\\' => 
         array (
             0 => __DIR__ . '/..' . '/nunomaduro/collision/src',
@@ -612,6 +604,7 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
         'App\\Models\\PickupPoints' => __DIR__ . '/../..' . '/app/Models/PickupPoints.php',
         'App\\Models\\Routes' => __DIR__ . '/../..' . '/app/Models/Routes.php',
         'App\\Models\\Seat' => __DIR__ . '/../..' . '/app/Models/Seat.php',
+        'App\\Models\\Setting' => __DIR__ . '/../..' . '/app/Models/Setting.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\WasSelected' => __DIR__ . '/../..' . '/app/Models/WasSelected.php',
         'App\\Policies\\AgentPolicy' => __DIR__ . '/../..' . '/app/Policies/AgentPolicy.php',
@@ -3390,11 +3383,6 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
         'NunoMaduro\\Collision\\Provider' => __DIR__ . '/..' . '/nunomaduro/collision/src/Provider.php',
         'NunoMaduro\\Collision\\SolutionsRepositories\\NullSolutionsRepository' => __DIR__ . '/..' . '/nunomaduro/collision/src/SolutionsRepositories/NullSolutionsRepository.php',
         'NunoMaduro\\Collision\\Writer' => __DIR__ . '/..' . '/nunomaduro/collision/src/Writer.php',
-        'October\\Rain\\Config\\DataWriter\\FileWriter' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/DataWriter/FileWriter.php',
-        'October\\Rain\\Config\\DataWriter\\Rewrite' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/DataWriter/Rewrite.php',
-        'October\\Rain\\Config\\LumenServiceProvider' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/LumenServiceProvider.php',
-        'October\\Rain\\Config\\Repository' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/Repository.php',
-        'October\\Rain\\Config\\ServiceProvider' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/ServiceProvider.php',
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\ActualValueIsNotAnObjectException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Exception/ActualValueIsNotAnObjectException.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',
