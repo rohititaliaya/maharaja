@@ -36,8 +36,8 @@ class BusController extends Controller
                 
                 $bus = DB::table('buses')
                     ->join('routes', 'buses.id', '=', 'routes.bus_id')
-                        ->where('routes.from', '=', request()->from)
-                        ->where('routes.to', '=', request()->to)
+                        ->where('routes.from', 'like', '%'.request()->from.'%')
+                        ->where('routes.to', 'like', '%'.request()->to.'%')
                     ->join('pickup_points', 'buses.id', '=', 'pickup_points.bus_id')
                         ->where('pickup_points.from', '=', request()->from)
                     ->join('drop_points', 'buses.id', '=', 'drop_points.bus_id')
@@ -67,8 +67,8 @@ class BusController extends Controller
                 
                 $bus = DB::table('buses')
                     ->join('routes', 'buses.id', '=', 'routes.bus_id')
-                        ->where('routes.from', '=', request()->from)
-                        ->where('routes.to', '=', request()->to)
+                         ->where('routes.from', 'like', '%'.request()->from.'%')
+                        ->where('routes.to', 'like', '%'.request()->to.'%')
                     ->join('pickup_points', 'buses.id', '=', 'pickup_points.bus_id')
                         ->where('pickup_points.from', '=', request()->from)
                     ->join('drop_points', 'buses.id', '=', 'drop_points.bus_id')
@@ -114,7 +114,13 @@ class BusController extends Controller
     public function store(Request $request)
     {
         $validator= Validator::make($request->all(),[
-            'plat_no' => 'unique:buses,plat_no'
+            'plat_no' => 'unique:buses,plat_no',
+            'plat_no' => 'unique:buses,plat_no',
+            'from'=>'required',
+            'to' => 'required',
+            'price'=>'required',
+            'default_price'=>'required',
+            'agent_id'=>'required'
         ]);
 
         if ($validator->fails()) {
@@ -126,30 +132,44 @@ class BusController extends Controller
             }
             return response()->json($error);
         }
-        try {
-            $path = null;
-            if ($request->hasFile('image')) {
-                $extension = pathinfo($request->file('image')->getClientOriginalName(), PATHINFO_EXTENSION);
-                $ctime = date("Ymdhis");
-                $file_name = $ctime.'.'.$extension;
-                $path = $request->file('image')->move(public_path('/images'),$file_name);
-                $reference = '/public/images/'.$file_name;
-                $path = $reference;
-            }
-            $bus = new Bus();
-            $bus->travels_name = $request->travels_name;
-            $bus->image = $path;
-            
-            if($request->has('plat_no')) {
-                $bus->plat_no = $request->plat_no;
-            }
-            $bus->agent_id = $request->agent_id;
-            $bus->status = $request->status;
-            $bus->save();
-
-        } catch (\Throwable $th) {
-            return response()->json(["error"=>$th->messages ()]);
+        #storing the bus
+        $path = null;
+        if ($request->hasFile('image')) {
+            $extension = pathinfo($request->file('image')->getClientOriginalName(), PATHINFO_EXTENSION);
+            $ctime = date("Ymdhis");
+            $file_name = $ctime.'.'.$extension;
+            $path = $request->file('image')->move(public_path('/images'),$file_name);
+            $reference = '/public/images/'.$file_name;
+            $path = $reference;
         }
+        $bus = new Bus();
+        $bus->travels_name = $request->travels_name;
+        $bus->image = $path;
+        if($request->has('plat_no')) {
+            $bus->plat_no = $request->plat_no;
+        }
+        $bus->agent_id = $request->agent_id;
+        $bus->status = $request->status;
+        $bus->save();
+
+        #storing the routes
+        $routes = new Routes();
+        $routes->from = json_encode($request->from);
+        $routes->to = json_encode($request->to);
+        $routes->bus_id  = $bus->id;
+        $routes->price = $request->price;
+        $routes->save();
+
+        #storing the defalt price with date
+        if(!empty($request->default_price)){
+            foreach ($request->default_price as $key => $value) {
+                $dateprice = new DatePrice();
+                $dateprice->date = $value['date'];
+                $dateprice->price = $value['price'];
+                $dateprice->route_id = $routes->id;
+                $dateprice->save();
+            }
+        }   
         return response()->json(['flag'=>true,
             'message'=>'Record Successfully created!',
             'data'=>$bus],201);

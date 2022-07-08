@@ -29,20 +29,15 @@ class PickupPointsController extends Controller
         if (request()->agent_id) {
             $buses = Bus::where('agent_id',request()->agent_id)->pluck('id')->toArray();
             $buses_city = Bus::where('agent_id',request()->agent_id)->select(['id','travels_name','plat_no'])->get();
-            $routes = Routes::whereIn('bus_id',$buses)->get(['from','bus_id'])->groupBy('bus_id');
-            $array = [];
-            $mb = [];
+            $routes = Routes::whereIn('bus_id',$buses)->select('from','bus_id')->get();
             foreach ($buses_city as $key => $value) {
-                if (array_key_exists($value->id, $routes->toArray())) {
-                    $buses_city[$key]->cities = $routes[$value->id];
-                    array_push($mb,$buses_city[$key]);
-                }else{
-                    array_push($array,$value->id);
-                }
+               foreach($routes as $frm){
+                   if($value->id == $frm['bus_id']){
+                       $buses_city[$key]->cities = $frm['from'];
+                   }
+               }
             }
-            
-            $b = Bus::whereIn('id',$array)->select('id','travels_name','plat_no')->get();
-            return response()->json(['flag'=>true ,'data'=>$mb,'routes_missing'=>$b]);
+            return response()->json(['flag'=>true ,'data'=>$buses_city]);
         }
 
     }
@@ -143,3 +138,4 @@ class PickupPointsController extends Controller
         //
     }
 }
+    

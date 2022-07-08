@@ -10,7 +10,6 @@
                 <tr>
                     <th>Id</th>
                     <th>Travels Name</th>
-                    <th>Image</th>
                     <th>Agent Name</th>
                 </tr>
             </thead>
@@ -28,7 +27,6 @@
           columns: [
                 {data: 'id', name: 'id'},
                 {data: 'travels_name', name: 'travels_name'},
-                {data: 'image', name: 'image'},
                 {data: 'agent.name', name: 'agent.name'},
           ]
       });

@@ -11,6 +11,7 @@ use App\Http\Controllers\DropPointsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SeatController;
 use App\Http\Controllers\ConfirmedSeatController;
+use App\Http\Controllers\Admin\AdminController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -53,7 +54,7 @@ Route::post('delete-route',[RoutesController::class,'destroy'])->name('delete-ro
 Route::post('routes',[RoutesController::class,'store'])->name('routes');
 Route::post('getroutes',[RoutesController::class,'index'])->name('routes');
 Route::post('get-bus-routes',[RoutesController::class,'index2'])->name('get-bus-routes');
-Route::post('chage-routes-response',[RoutesController::class,'getOnChangeResponse'])->name('chage-routes-response');
+Route::post('update-bus-and-routes',[RoutesController::class,'updateBusAndRoutes'])->name('update-bus-and-routes');
 Route::post('update-routes',[RoutesController::class,'update'])->name('update-routes');
 
 // ------- create user ----------//
@@ -81,3 +82,5 @@ Route::post('get-user-cansal',[ConfirmedSeatController::class,'usershowCansal'])
 
 // ---------- payment api --------------//
 Route::post('payment-status',[ConfirmedSeatController::class,'payment_status'])->name('payment-status');  
+
+Route::post('privacy',[AdminController::class,'privacy'])->name('privacy');  

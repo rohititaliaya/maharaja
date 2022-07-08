@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Agent;
 use DataTables;
+use App\Services\FCMService;
 
 class AgentController extends Controller
 {
@@ -34,12 +35,18 @@ class AgentController extends Controller
         return view('agents.index');
     }
 
-    public function approve(Request $request)
+   public function approve(Request $request)
     {
         $agent = Agent::find($request->id);
-        $agent->status = "1";
+        $agent->status = "1";   
         $agent->save();
-
+        FCMService::send(
+            $agent->fcmid,
+            [
+                'title' => 'Bus Booking',
+                'body' => 'Your account is approved !',
+            ]
+        );
         return redirect()->back()->with('success', 'request approved successfully');
     }
 
@@ -48,7 +55,13 @@ class AgentController extends Controller
         $agent = Agent::find($request->id);
         $agent->status = "0";
         $agent->save();
-
+        FCMService::send(
+            $agent->fcmid,
+            [
+                'title' => 'Bus Booking',
+                'body' => 'Your account is dis-approved !',
+            ]
+        );
         return redirect()->back()->with('success', 'request approved successfully');
     }
 

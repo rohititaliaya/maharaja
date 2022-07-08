@@ -21,7 +21,7 @@ class CityController extends Controller
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function($row){
-                    $btn = '<a href="javascript:void(0)" class="btn btn-primary btn-sm mx-2">Edit</a>';
+                    $btn = '<a href="city/'.$row->id.'/edit" class="btn btn-primary btn-sm mx-2">Edit</a>';
                     $btn = $btn.'<a href="javascript:void(0)" class="btn btn-danger btn-sm mx-2">Delete</a>';
                     return $btn;
                 })
@@ -29,11 +29,6 @@ class CityController extends Controller
                 ->make(true);
         }
         return view('city.index');
-    }
-
-    public function getCustomFilterData(Request $request)
-    {
-
     }
 
     /**
@@ -54,7 +49,11 @@ class CityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $city = new City();
+        $city->name = $request->city;
+        $city->save();
+
+        return redirect()->back()->with('success', 'successfully added !');
     }
 
     /**
@@ -76,7 +75,8 @@ class CityController extends Controller
      */
     public function edit($id)
     {
-        //
+        $city = City::find($id);
+        return view('city.edit', compact('city'));
     }
 
     /**
@@ -87,8 +87,12 @@ class CityController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        //
+    {   
+        $city = City::find($id);
+        $city->name = $request->city;
+        $city->save();
+
+        return redirect('city')->with('success', 'Updated successfully !');
     }
 
     /**

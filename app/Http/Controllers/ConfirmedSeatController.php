@@ -166,9 +166,7 @@ class ConfirmedSeatController extends Controller
                 $to = $ccseat->to;
                 $date = $ccseat->date;
 
-                $route = Routes::where('bus_id',$bus_id)->where('from',$from)
-                ->where('to',$to)
-                ->first();
+                $route = Routes::where('bus_id',$bus_id)->first();
                 
                 $date_price_seats = DatePrice::where('route_id', $route->id)->where('date', $date)->first();
                 $seats = json_decode($ccseat->seatNo);
@@ -341,9 +339,7 @@ class ConfirmedSeatController extends Controller
                 $to = $ccseat->to;
                 $date = $ccseat->date;
 
-                $route = Routes::where('bus_id',$bus_id)->where('from',$from)
-                ->where('to',$to)
-                ->first();
+                $route = Routes::where('bus_id',$bus_id)->first();
                 
                 $date_price_seats = DatePrice::where('route_id', $route->id)->where('date', $date)->first();
                 $seats = json_decode($ccseat->seatNo);
@@ -424,9 +420,7 @@ class ConfirmedSeatController extends Controller
                 $to = $ccseat->to;
                 $date = $ccseat->date;
 
-                $route = Routes::where('bus_id',$bus_id)->where('from',$from)
-                ->where('to',$to)
-                ->first();
+                $route = Routes::where('bus_id',$bus_id)->first();
                 
                 $date_price_seats = DatePrice::where('route_id', $route->id)->where('date', $date)->first();
                 $seats = json_decode($ccseat->seatNo);

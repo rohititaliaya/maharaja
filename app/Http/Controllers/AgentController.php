@@ -25,12 +25,17 @@ class AgentController extends Controller
     {
         $agent = Agent::where('mobile',$request->mobile)->select(['id','name','mobile','fcmid','status'])->first();
         if(!empty($agent)) {
-            $agent->fcmid = $request->fcmid;
-            $agent->save();
-            return response()->json(['flag'=>true,'message'=>'success', 'data'=>$agent]);
+            if ($agent->status != '0') {
+                $agent->fcmid = $request->fcmid;
+                $agent->save();
+                return response()->json(['flag'=>true,'message'=>'success', 'data'=>$agent]);
+            }else{
+                $agent->fcmid = $request->fcmid;
+                $agent->save();
+                return response()->json(['flag'=>false,'message'=>'request is not approved. please wait..', 'data'=>$agent]);
+            }
         }
-        
-        return response()->json(['flag'=>false, 'message'=>'agent not found']);
+        return response()->json(['flag'=>false, 'message'=>'you need to registere first']);
     }
 
     /**
@@ -42,8 +47,7 @@ class AgentController extends Controller
     {
         // dd(request()->fcm_token);
         FCMService::send(
-            request()->fcm_token,
-           [ 
+            request()->fcm_token,[ 
                 'title' => "Mario",
                 'body' => 'bus booking'
             ]

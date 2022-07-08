@@ -27,7 +27,7 @@ class Bus extends Model
 
     public function routes()
     {
-        return $this->hasMany(Routes::class, 'bus_id', 'id');
+        return $this->hasOne(Routes::class, 'bus_id', 'id');
     }
 
     public function cseat()

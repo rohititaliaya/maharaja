@@ -108,6 +108,10 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
             'PhpParser\\' => 10,
             'PhpOption\\' => 10,
         ),
+        'O' => 
+        array (
+            'October\\Rain\\Config\\' => 20,
+        ),
         'N' => 
         array (
             'NunoMaduro\\Collision\\' => 21,
@@ -374,6 +378,10 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
+        'October\\Rain\\Config\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src',
+        ),
         'NunoMaduro\\Collision\\' => 
         array (
             0 => __DIR__ . '/..' . '/nunomaduro/collision/src',
@@ -532,7 +540,17 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
         'App\\Console\\Commands\\DateCron' => __DIR__ . '/../..' . '/app/Console/Commands/DateCron.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\Http\\Controllers\\Admin\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminController.php',
         'App\\Http\\Controllers\\Admin\\AgentController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AgentController.php',
+        'App\\Http\\Controllers\\Admin\\BusController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/BusController.php',
+        'App\\Http\\Controllers\\Admin\\CityController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/CityController.php',
+        'App\\Http\\Controllers\\Admin\\ConfirmedSeatController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/ConfirmedSeatController.php',
+        'App\\Http\\Controllers\\Admin\\DatePriceController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/DatePriceController.php',
+        'App\\Http\\Controllers\\Admin\\DropPointController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/DropPointController.php',
+        'App\\Http\\Controllers\\Admin\\PaymentController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/PaymentController.php',
+        'App\\Http\\Controllers\\Admin\\PickupPointController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/PickupPointController.php',
+        'App\\Http\\Controllers\\Admin\\RouteController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/RouteController.php',
+        'App\\Http\\Controllers\\Admin\\SeatController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/SeatController.php',
         'App\\Http\\Controllers\\Admin\\UsersController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/UsersController.php',
         'App\\Http\\Controllers\\AgentController' => __DIR__ . '/../..' . '/app/Http/Controllers/AgentController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmPasswordController.php',
@@ -3372,6 +3390,11 @@ class ComposerStaticInitbb91f31e07f94fd4c557f667e690c31f
         'NunoMaduro\\Collision\\Provider' => __DIR__ . '/..' . '/nunomaduro/collision/src/Provider.php',
         'NunoMaduro\\Collision\\SolutionsRepositories\\NullSolutionsRepository' => __DIR__ . '/..' . '/nunomaduro/collision/src/SolutionsRepositories/NullSolutionsRepository.php',
         'NunoMaduro\\Collision\\Writer' => __DIR__ . '/..' . '/nunomaduro/collision/src/Writer.php',
+        'October\\Rain\\Config\\DataWriter\\FileWriter' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/DataWriter/FileWriter.php',
+        'October\\Rain\\Config\\DataWriter\\Rewrite' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/DataWriter/Rewrite.php',
+        'October\\Rain\\Config\\LumenServiceProvider' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/LumenServiceProvider.php',
+        'October\\Rain\\Config\\Repository' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/Repository.php',
+        'October\\Rain\\Config\\ServiceProvider' => __DIR__ . '/..' . '/daftspunk/laravel-config-writer/src/ServiceProvider.php',
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\ActualValueIsNotAnObjectException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Exception/ActualValueIsNotAnObjectException.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',

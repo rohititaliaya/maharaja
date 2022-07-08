@@ -31,31 +31,45 @@ class RoutesController extends Controller
     public function index2()
     {
         if (request()->bus_id) {
-            $routes = Routes::where('bus_id', request()->bus_id)->get();
-            $array = [];
-            foreach ($routes as $key => $value) {
-                $from_id = $routes[$key]['from']['city_id'];
-                $array[$key] = $routes[$key]['from'];
-                foreach ($routes as $key1 => $value1) {
-                    $from_id2 = $routes[$key1]['from']['city_id'];
-                    if ($from_id2 == $from_id) {
-                        $array[$key]['to_array'][] = $routes[$key1]['to'];
-                    }
-                }
-            }
-            return response()->json(['flag'=>true,'message'=> 'success','data'=>$array]);
+            $routes = Routes::where('bus_id', request()->bus_id)->first();
+            $dateprice = DatePrice::where('route_id', $routes->id)->get();
+            $routes['date_prices'] = $dateprice; 
+            return response()->json(['flag'=>true,'message'=> 'success','data'=>$routes]);
         }else{
             return response()->json(['flag'=>false, 'message'=>'bus id missmatch in url you pass']);
         }
     }
 
-    public function getOnChangeResponse()
+    public function updateBusAndRoutes(Request $request)
     {
-        if (request()->bus_id && request()->from && request()->to) {
-            $routes = Routes::where('bus_id', request()->bus_id)->where('from', request()->from)->where('to', request()->to)->with('date_prices')->select('id','price')->first();
-            if (!$routes) {
-                return response()->json(['flag'=>false,'message'=> 'Record not found !']);
+        if (request()->bus_id) {
+            #storing the bus
+            $path = null;
+            if ($request->hasFile('image')) {
+                $extension = pathinfo($request->file('image')->getClientOriginalName(), PATHINFO_EXTENSION);
+                $ctime = date("Ymdhis");
+                $file_name = $ctime.'.'.$extension;
+                $path = $request->file('image')->move(public_path('/images'),$file_name);
+                $reference = '/public/images/'.$file_name;
+                $path = $reference;
             }
+            $bus = Bus::find(request()->bus_id);
+            $bus->travels_name = $request->travels_name;
+            $bus->image = $path;
+            if($request->has('plat_no')) {
+                $bus->plat_no = $request->plat_no;
+            }
+            $bus->agent_id = $request->agent_id;
+            $bus->status = $request->status;
+            $bus->save();
+    
+            #storing the routes
+            $routes = Routes::where('bus_id', request()->bus_id)->first();
+            $routes->from = json_encode($request->from);
+            $routes->to = json_encode($request->to);
+            $routes->bus_id  = $bus->id;
+            $routes->price = $request->price;
+            $routes->save();
             return response()->json(['flag'=>true,'message'=> 'success','data'=>$routes]);
         }else{
             return response()->json(['flag'=>false, 'message'=>'Record not found !']);
@@ -175,6 +189,7 @@ class RoutesController extends Controller
             }
             return response()->json($error);
         }
+        #updating the bus
         $reference = null;
         if ($request->hasFile('image')) {
             $extension = pathinfo($request->file('image')->getClientOriginalName(), PATHINFO_EXTENSION);
@@ -184,23 +199,22 @@ class RoutesController extends Controller
             $reference = '/public/images/'.$file_name;
             // $request['image'] = $reference;
         }
-        // updating bus 
         $bus = Bus::find($request->bus_id);
-        if ($request->travels_name) {
-            $bus->travels_name = $request->travels_name;
-        }
-        if ($request->hasFile('image')) {
-            $bus->image = $reference;
-        }
-        if ($request->has('plat_no')) {
-            $bus->plat_no = $request->plat_no;
-        }
-        $bus->save(); 
+        $bus->travels_name = $request->travels_name;
+        $bus->image = $reference;
+        $bus->plat_no = $request->plat_no;
+        $bus->save();
         // finding the route
-        $routes = Routes::where('from', $request->from)->where('bus_id', $request->bus_id)->where('to',$request->to)->first();
+        $routes = Routes::where('bus_id', $request->bus_id)->first();
         if($routes){
             if ($request->price) {
                 $routes->price = $request->price; 
+            }
+            if ($request->from) {
+                $routes->from = json_encode($request->from); 
+            }
+            if ($request->to) {
+                $routes->to = json_encode($request->to); 
             }
             $routes->save();
             // updateing the default date price
@@ -214,7 +228,6 @@ class RoutesController extends Controller
             }
         }
         return response()->json(['flag'=>true,'message'=>'record updated successfully !']);
-        
     }
 
     /**

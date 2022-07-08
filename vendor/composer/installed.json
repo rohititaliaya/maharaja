@@ -64,6 +64,66 @@
             "install-path": "../brick/math"
         },
         {
+            "name": "daftspunk/laravel-config-writer",
+            "version": "v1.1",
+            "version_normalized": "1.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/daftspunk/laravel-config-writer.git",
+                "reference": "ad45d05fcadc3488d2e2bd40772f54cd3189877b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/daftspunk/laravel-config-writer/zipball/ad45d05fcadc3488d2e2bd40772f54cd3189877b",
+                "reference": "ad45d05fcadc3488d2e2bd40772f54cd3189877b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "5.*|6.*|7.*|8.*|9.*",
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0"
+            },
+            "time": "2022-02-13T03:31:49+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "October\\Rain\\Config\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexey Bobkov",
+                    "email": "aleksey.bobkov@gmail.com"
+                },
+                {
+                    "name": "Samuel Georges",
+                    "email": "daftspunky@gmail.com"
+                }
+            ],
+            "description": "Laravel provider to be able to rewrite configuration",
+            "homepage": "http://octobercms.com",
+            "keywords": [
+                "config",
+                "laravel",
+                "october",
+                "october cms",
+                "provider",
+                "write"
+            ],
+            "support": {
+                "issues": "https://github.com/daftspunk/laravel-config-writer/issues",
+                "source": "https://github.com/daftspunk/laravel-config-writer/tree/v1.1"
+            },
+            "install-path": "../daftspunk/laravel-config-writer"
+        },
+        {
             "name": "dflydev/dot-access-data",
             "version": "v3.0.1",
             "version_normalized": "3.0.1.0",

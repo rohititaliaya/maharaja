@@ -19,14 +19,24 @@ class Routes extends Model
 
     public function getFromAttribute($value)
     {
-        $city = City::find($value);
-        return ['city_id'=>$value,'city_name'=>$city->name];
+        $routes = json_decode($value);
+        $array = [];
+        foreach ($routes as $v) {
+            $city = City::find($v);
+            array_push($array,['city_id'=>$v,'city_name'=>$city->name]);
+        }
+        return $array;
     }
 
     public function getToAttribute($value)
     {
-        $city = City::find($value);
-        return ['city_id'=>$value,'city_name'=>$city->name];
+        $routes = json_decode($value);
+        $array = [];
+        foreach ($routes as $v) {
+            $city = City::find($v);
+            array_push($array,['city_id'=>$v,'city_name'=>$city->name]);
+        }
+        return $array;
     }
 
     public function busname(Type $var = null)

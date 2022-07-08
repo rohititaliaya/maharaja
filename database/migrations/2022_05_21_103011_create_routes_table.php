@@ -17,10 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('bus_id');
             $table->foreign('bus_id')->references('id')->on('buses');
-            $table->unsignedBigInteger('from');
-            $table->foreign('from')->references('id')->on('cities');
-            $table->unsignedBigInteger('to');
-            $table->foreign('to')->references('id')->on('cities');
+            $table->text('from');
+            $table->text('to');
             $table->integer('price');
             $table->enum('status',['A','D'])->default('A');
             $table->timestamps();

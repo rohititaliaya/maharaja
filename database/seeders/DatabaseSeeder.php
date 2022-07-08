@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             AgentSeeder::class,
             BusSeeder::class,
-            RoutesSeeder::class
+            SeatSeeder::class
         ]);
     }
 }
