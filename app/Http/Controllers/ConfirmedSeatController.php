@@ -133,8 +133,12 @@ class ConfirmedSeatController extends Controller
 
         $cbookbus = new ConfirmedSeat();
         $cbookbus->bus_id = $request->bus_id;
-        $cbookbus->mobile = $request->mobile;
         $cbookbus->passenger_name = $request->passenger_name;
+        if ($request->user_type == "1") {
+            $bus = Bus::find($request->bus_id);
+            $cbookbus->passenger_name = $bus->travels_name;
+        }    
+        $cbookbus->mobile = $request->mobile;
         $cbookbus->age = $request->age;
         $cbookbus->gender = $request->gender;
         $cbookbus->pickup_point = $request->pickup_point;

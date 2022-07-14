@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="card p-5">
         <div>
-            <h2>Privacy-Policy</h2>
+            <h2>Settings</h2>
         </div>
         
         <form action="{{ route('privacy.policy') }}" method="post">
@@ -24,6 +24,18 @@
             <div class="modal-body">
                 <label for="razorpay_apikey">Razor pay api key:</label>
                 <input type="text" name="razorpay_apikey" id="razorpay_apikey" class="form-control" value="{{$setting->razorpay_apikey}}" required>
+            </div>
+            <div class="modal-body">
+                <label for="commission_rate">Commission rate(%):</label>
+                <input type="text" name="commission_rate" id="commission_rate" class="form-control" value="{{$setting->commission_rate}}" required>
+            </div>
+            <div class="modal-body">
+                <label for="admin_user">Admin Username:</label>
+                <input type="text" name="admin_user" id="admin_user" class="form-control" value="{{$setting->admin_user}}" required>
+            </div>
+            <div class="modal-body">
+                <label for="admin_pass">Admin Password:</label>
+                <input type="password" name="admin_pass" id="admin_pass" class="form-control" value="{{$setting->admin_pass}}" required>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-info">Update</button>

@@ -6,9 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\City;
 use DataTables;
+use Session;
 
 class CityController extends Controller
 {
+    public function __construct()
+    {
+        if(Session::get("is_loggedin") == false && empty(Session::get('is_loggedin'))) {
+            return redirect()->to('/login')->send();
+        }
+    }
     /**
      * Display a listing of the resource.
      *

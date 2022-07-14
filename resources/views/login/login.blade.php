@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{asset('/images/bus.png')}}">
   <title>AdminLTE 3 | Log in</title>
 
   <!-- Google Font: Source Sans Pro -->
@@ -16,7 +17,9 @@
 <body class="hold-transition login-page">
 <div class="login-box card">
   <div class="login-logo">
-    <a href="../../index2.html"><b>Admin</b> Login</a>
+  <img src="{{asset('/images/bus.png')}}" class="mt-4" height="75px" />
+    <br>
+    <a href="{{ route('login')}}"><b>Admin </b>Login</a>
   </div>
   <!-- /.login-logo -->
   <div class="card">
@@ -86,7 +89,7 @@
       </p> --}}
     </div>
     <!-- /.login-card-body -->
-  </div>
+  
 </div>
 <!-- /.login-box -->
 <!-- jQuery -->

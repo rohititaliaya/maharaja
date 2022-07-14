@@ -5,10 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ConfirmedSeat;
+use App\Models\Bus;
 use DataTables;
-
+use Session;
+use Carbon\Carbon;
+ 
 class ConfirmedSeatController extends Controller
 {
+    public function __construct()
+    {
+        if(Session::get("is_loggedin") == false && empty(Session::get('is_loggedin'))) {
+            return redirect()->to('/login')->send();
+        }
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,25 +25,63 @@ class ConfirmedSeatController extends Controller
      */
     public function index(Request $request)
     {
+        $d1 = null;
+        if(request()->date){
+            $createdAt = Carbon::parse(request()->date);
+            $d1 = $createdAt->format('d-M-Y');
+        }
+        $ps = $request->get('payment_status');
+        $s = $request->get('status');
+        $b = $request->get('bus_id');
+        $buses = Bus::select('id','travels_name')->get();
         if ($request->ajax()) {
             $data = ConfirmedSeat::select('*');
             return DataTables::of($data)
             ->addIndexColumn()
+            ->filter(function ($instance) use ($ps,$s,$b,$d1) {
+                if ($ps=='1' || $ps=='0') {
+                    $instance->where('payment_status', $ps);
+                }
+                if ($s=='1' || $s=='0') {
+                    $instance->where('status', $s);
+                }
+                if (!is_null($b) || $b !="") {
+                    $instance->where('bus_id', $b);
+                }
+                if (!is_null($d1) || $d1!="") {
+                    $instance->where('date', $d1);
+                }
+            })
+            ->addColumn('bus_name', function($row){
+                $bus = Bus::find($row->bus_id);
+                return $bus->travels_name;
+            })
             ->addColumn('seatNo', function($row){
                     $m = implode(' & ', json_decode($row->seatNo));
                     return $m;
                 })->addColumn('payment_status', function($row){
                     if ($row->payment_status == "1") {
                         $m = "<span class='badge bg-success'>success</span>";
-                    }else{
+                    }
+                    if ($row->payment_status == "0") {
                         $m = "<span class='badge bg-danger'>failed</span>";
                     }
                     return $m;
                 })
-                ->rawColumns(['seatNo','payment_status'])
+                ->addColumn('seat_status', function($row){
+                    if ($row->status == "1") {
+                        $m = "<span class='badge bg-success'>confirmed</span>";
+                    }
+                    if ($row->status == "0") {
+                        $m = "<span class='badge bg-danger'>cancelled</span>";
+                    }
+                    return $m;
+                })
+                ->rawColumns(['bus_name','seatNo','payment_status','seat_status'])
                 ->make(true);
         }
-        return view('confirmed_seat.index');
+        return view('confirmed_seat.index',compact('buses'));
+        
     }
 
     public function getCustomFilterData(Request $request)

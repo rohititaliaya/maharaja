@@ -5,10 +5,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AdminPolicy;
+use App\Models\Bus;
 use App\Models\Setting;
+use App\Models\Agent;
+use App\Models\ConfirmedSeat;
+use App\Models\User;
+use Session;
 
 class AdminController extends Controller
 {
+    // public function __construct()
+    // {
+    //     if(Session::get("is_loggedin") == false && empty(Session::get('is_loggedin'))) {
+    //         // dd(Session::get("is_loggedin"));
+    //         return view('login.login');
+    //     }
+    // }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +28,22 @@ class AdminController extends Controller
      */
     public function index()
     {
-        return view('welcome');
+        if(!Session::has('is_loggedin'))
+        {
+            return view('login.login');
+        }
+        $buses = Bus::all()->count();
+        $agents = Agent::all()->count();
+        $users = User::all()->count();
+        $cbs = ConfirmedSeat::all()->count();
+        $array = [
+            'total_buses' => $buses,
+            'total_agents' =>$agents,
+            'total_users' => $users,
+            'current_bookings' => $cbs
+        ];
+        // return $array;
+        return view('welcome', compact('array'));
     }
 
     /**
@@ -31,7 +58,10 @@ class AdminController extends Controller
 
     public function loginpost(Request $request)
     {
-        if($request->email == config('Admin.email') && $request->password == config('Admin.password')){
+        $set = Setting::find(1);
+        $setting = json_decode($set->values);
+        if($request->email == $setting->admin_user && $request->password == $setting->admin_pass){
+            Session::put('is_loggedin', 'admin');
             return redirect()->route('dashboard')->with('success', 'Login successfully !');
         }
         return redirect()->back()->with('danger','Invalid credentials !');
@@ -39,6 +69,7 @@ class AdminController extends Controller
 
     public function logout()
     {
+        Session::flush();
         return redirect()->route('login')->with('success','logout successfully !');
     }
 
@@ -56,6 +87,10 @@ class AdminController extends Controller
     }
     public function getPolicy(Request $request)
     {
+        if(!Session::has('is_loggedin'))
+        {
+            return view('login.login');
+        }
         $sets = Setting::find(1);
         $set = json_decode($sets->values);
         return view('policy.policy',['setting' => $set]);

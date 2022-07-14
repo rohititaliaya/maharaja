@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Agent;
 use DataTables;
 use App\Services\FCMService;
+use Session;
 
 class AgentController extends Controller
 {
+    public function __construct()
+    {
+        if(Session::get("is_loggedin") == false && empty(Session::get('is_loggedin'))) {
+            return redirect()->to('/login')->send();
+        }
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,6 +24,7 @@ class AgentController extends Controller
      */
     public function index(Request $request)
     {
+
         if ($request->ajax()) {
             $data = Agent::select('*');
             return DataTables::of($data)
