@@ -15,7 +15,7 @@
                         <select id='bus_id' name="bus_id" class="form-control" style="width: 200px">
                             <option value="">--Select Status--</option>
                             @foreach ($buses as $item)
-                                <option value="{{$item->id}}">{{$item->travels_name}}</option>
+                                <option value="{{$item->id}}">{{$item->travels_name}} {{$item->plat_no}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -78,13 +78,15 @@
       var table = $('#laravel_datatable').DataTable({
           processing: true,
           serverSide: true,
+          searching:false,
           ajax: {
             url:"{{ route('confirmed-seat') }}",    
             data: function (d) {
                 d.payment_status = $('#payment_status').val(),
                 d.status = $('#seat_status').val(),
                 d.bus_id = $('#bus_id').val(),
-                d.date = $('#date').val()
+                d.date = $('#date').val(), 
+                d.search = $('input[type="search"]').val()
             }
         },
           columns: [

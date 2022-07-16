@@ -17,7 +17,7 @@ class CityController extends Controller
     {
         if (request()->query) {
             $q = request()->get('query');
-            $cities = City::where('name', 'Like',$q. '%')->get();
+            $cities = City::where('name', 'Like',$q. '%')->orderBy('name','asc')->get();
             return response()->json(["flag"=>true, "data"=> $cities]);    
         }
         return ["flag"=>true, "data"=> City::all()];

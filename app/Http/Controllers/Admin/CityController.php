@@ -28,8 +28,12 @@ class CityController extends Controller
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function($row){
-                    $btn = '<a href="city/'.$row->id.'/edit" class="btn btn-primary btn-sm mx-2">Edit</a>';
-                    $btn = $btn.'<a href="javascript:void(0)" class="btn btn-danger btn-sm mx-2">Delete</a>';
+                    $btn = '<div class="d-flex"> <a href="city/'.$row->id.'/edit" class="btn btn-primary btn-sm mx-2">Edit</a>';
+                    $btn = $btn.'<form action="city/'.$row->id.'" method="POST">
+                     '.csrf_field().'
+                     '.method_field("POST").'
+                     <button type="submit" class="btn btn-danger">Delete</button>
+                    </form></div>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -108,8 +112,12 @@ class CityController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($request)
     {
-        //
+        $city = City::find(request()->id);
+        $city->delete();
+        
+        return redirect()->back()->with('success', 'city deleted successfully !');
+        
     }
 }

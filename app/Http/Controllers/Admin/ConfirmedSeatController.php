@@ -33,12 +33,12 @@ class ConfirmedSeatController extends Controller
         $ps = $request->get('payment_status');
         $s = $request->get('status');
         $b = $request->get('bus_id');
-        $buses = Bus::select('id','travels_name')->get();
+        $buses = Bus::select('id','travels_name','plat_no')->get();
         if ($request->ajax()) {
             $data = ConfirmedSeat::select('*');
             return DataTables::of($data)
             ->addIndexColumn()
-            ->filter(function ($instance) use ($ps,$s,$b,$d1) {
+            ->filter(function ($instance) use ($ps,$s,$b,$d1,$request) {
                 if ($ps=='1' || $ps=='0') {
                     $instance->where('payment_status', $ps);
                 }
