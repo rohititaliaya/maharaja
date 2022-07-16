@@ -326,9 +326,10 @@ class ConfirmedSeatController extends Controller
             $confirm_seat = ConfirmedSeat::find(request()->book_id);
             $bdate = $confirm_seat->date;
             $bptime = $confirm_seat->pick_time;
-
+            $date = $bdate.' '.$bptime;
+            $newDate = date('Y-m-d H:i:s', strtotime($date. ' -3 hours'));
             $d1 = strtotime(Carbon::now()->format('d-M-Y H:m'));
-            $d2 =strtotime($bdate.' '.$bptime);
+            $d2 =strtotime($newDate);
             if ($d2<$d1) {
                 return response()->json(['flag'=>false,'message'=>'you can not cansal seat now !']);
             }

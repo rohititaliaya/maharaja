@@ -8,6 +8,8 @@ use App\Models\Routes;
 use App\Models\PickupPoints;
 use App\Models\DropPoints;
 use App\Models\DatePrice;
+use App\Models\ConfirmedSeat;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
@@ -262,6 +264,9 @@ class BusController extends Controller
                 
                 // ---------- deletign drop points ------------//
                 $drop = DropPoints::where('bus_id', $bus->id)->delete();
+                
+                //---------- deleting payments list ---------//
+                $cs = ConfirmedSeat::where('bus_id', $bus->id)->delete();
                 
                 // deleting bus too
                 $bus->delete();

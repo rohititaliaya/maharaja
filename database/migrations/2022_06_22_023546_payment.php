@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('book_id');
-            $table->foreign('book_id')->references('id')->on('confirmed_seats');
             $table->BigInteger('user_id');
             $table->string('transaction_id')->nullable();
             $table->enum('status',[0,1]);
