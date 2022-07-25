@@ -61,7 +61,7 @@ class BankDetailController extends Controller
      * @param  \App\Http\Requests\StoreBankDetailRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreBankDetailRequest $request)
+    public function store(Request $request)
     {
         //
     }

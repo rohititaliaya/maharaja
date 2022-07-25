@@ -83,4 +83,7 @@ Route::post('get-user-cansal',[ConfirmedSeatController::class,'usershowCansal'])
 // ---------- payment api --------------//
 Route::post('payment-status',[ConfirmedSeatController::class,'payment_status'])->name('payment-status');  
 
-Route::post('privacy',[AdminController::class,'privacy'])->name('privacy');  
+Route::post('privacy',[AdminController::class,'privacy'])->name('privacy');
+// ----- store bank detail -------//  
+
+Route::post('addbank',[AgentController::class,'addbank'])->name('addbank');  

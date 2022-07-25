@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAgentRequest;
 use App\Http\Requests\UpdateAgentRequest;
 use App\Models\Agent;
+use App\Models\BankDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\FCMService;
@@ -134,5 +135,27 @@ class AgentController extends Controller
     public function destroy(Agent $agent)
     {
         //
+    }
+
+    public function addbank(Request $request)
+    {
+        // ------ decryption ---------//
+        // $key = ''; 
+        // $iv = '';
+        // $datapost = 'post elemetns';
+        // $cipher = openssl_encrypt(json_encode($datapost,true), 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+        // $body = base64_encode($cipher);
+
+        //----- saving the bank --------//
+        $bank = new BankDetail();
+        $bank->agent_id = $request->agent_id;
+        $bank->account_number = $request->account_number;
+        $bank->banificary_name = $request->banificary_name;
+        $bank->ifsc_code = $request->ifsc_code;
+        $bank->bank_name = $request->bank_name;
+        $bank->city_name = $request->city_name;
+        $bank->save();
+
+        return response()->json(['fllag'=>true ,'message'=>'data saved successfully']);
     }
 }
