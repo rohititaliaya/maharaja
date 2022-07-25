@@ -22,6 +22,7 @@ Route::get('/', [App\Http\Controllers\Admin\AdminController::class, 'index'])->n
 
 Route::get('users', [App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users');
 
+Route::get('agent/bank', [App\Http\Controllers\Admin\BankDetailController::class, 'index'])->name('agent.bank');
 Route::get('agents', [App\Http\Controllers\Admin\AgentController::class, 'index'])->name('agents');
 Route::get('agent/agent-approve/{id}', [App\Http\Controllers\Admin\AgentController::class, 'approve']);
 Route::get('agent/agent-dis-approve/{id}', [App\Http\Controllers\Admin\AgentController::class, 'DisApprove']);

@@ -75,6 +75,15 @@
               </p>
             </a>
           </li>
+
+          <li class="nav-item">
+            <a href="{{ url('agent/bank') }}" class="nav-link">
+              <i class="nav-icon fas fa-users fa-lg "></i>
+              <p>
+                Agent Bank Details
+              </p>
+            </a>
+          </li>
           {{-- <li class="nav-item">
             <a href="{{ url('users') }}" class="nav-link">
               <i class="nav-icon fas fa-columns"></i>
