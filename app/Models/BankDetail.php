@@ -22,4 +22,50 @@ class BankDetail extends Model
     {
         return $this->belongsTo(Agent::class, 'agent_id' , 'id');
     }
+    
+    public function getAccountNumberAttribute($value)
+    {
+        $key ='maharaja@atul#cn';
+        $iv=   'encryptionIntVec';          
+        $res2=base64_decode($value);
+        $res  =   openssl_decrypt($res2, 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+        return $res;
+    }
+    
+    public function getBanificaryNameAttribute($value)
+    {
+        $key ='maharaja@atul#cn';
+        $iv=   'encryptionIntVec';          
+        $res2=base64_decode($value);
+        $res  =   openssl_decrypt($res2, 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+        return $res;
+    }
+    
+    public function getIfscCodeAttribute($value)
+    {
+        $key ='maharaja@atul#cn';
+        $iv=   'encryptionIntVec';          
+        $res2=base64_decode($value);
+        $res  =   openssl_decrypt($res2, 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+        return $res;
+    }
+    
+    public function getBankNameAttribute($value)
+    {
+        $key ='maharaja@atul#cn';
+        $iv=   'encryptionIntVec';          
+        $res2=base64_decode($value);
+        $res  =   openssl_decrypt($res2, 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+        return $res;
+    }
+    
+    public function getCityNameAttribute($value)
+    {
+        $key ='maharaja@atul#cn';
+        $iv=   'encryptionIntVec';          
+        $res2=base64_decode($value);
+        $res  =   openssl_decrypt($res2, 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+        return $res;
+    }
+    
 }

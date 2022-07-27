@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('ifsc_code');
             $table->text('bank_name');
             $table->text('city_name');
+            $table->text('mobile');
             $table->timestamps();
         });
     }

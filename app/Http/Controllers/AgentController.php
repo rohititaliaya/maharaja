@@ -136,6 +136,20 @@ class AgentController extends Controller
     {
         //
     }
+    public function getbank(Request $request)
+    {
+        if (request()->agent_id) {
+            # code...
+            $bk = BankDetail::where('agent_id', $request->agent_id)->first();
+            if ($bk) {
+                return response()->json(['flag'=>true ,'message'=>$bk]);
+            }else{
+                return response()->json(['flag'=>true ,'message'=>'data not found']);
+            }
+        }else{
+            return response()->json(['flag'=>true ,'message'=>'agent_id is null']);
+        }
+    }
 
     public function addbank(Request $request)
     {
@@ -147,15 +161,29 @@ class AgentController extends Controller
         // $body = base64_encode($cipher);
 
         //----- saving the bank --------//
-        $bank = new BankDetail();
-        $bank->agent_id = $request->agent_id;
-        $bank->account_number = $request->account_number;
-        $bank->banificary_name = $request->banificary_name;
-        $bank->ifsc_code = $request->ifsc_code;
-        $bank->bank_name = $request->bank_name;
-        $bank->city_name = $request->city_name;
-        $bank->save();
+        $bk = BankDetail::where('agent_id', $request->agent_id)->first();
+        if ($bk) {
+            $bk->account_number = $request->account_number;
+            $bk->banificary_name = $request->banificary_name;
+            $bk->ifsc_code = $request->ifsc_code;
+            $bk->bank_name = $request->bank_name;
+            $bk->city_name = $request->city_name;
+            $bk->city_name = $request->city_name;
+            $bk->mobile = $request->mobile;
+            $bk->save();
+            return response()->json(['flag'=>true ,'message'=>'data updated successfully']);
+        }else{
+            $bank = new BankDetail();
+            $bank->agent_id = $request->agent_id;
+            $bank->account_number = $request->account_number;
+            $bank->banificary_name = $request->banificary_name;
+            $bank->ifsc_code = $request->ifsc_code;
+            $bank->bank_name = $request->bank_name;
+            $bank->city_name = $request->city_name;
+            $bank->mobile = $request->mobile;
+            $bank->save();
+            return response()->json(['flag'=>true ,'message'=>'data saved successfully']);
+        }
 
-        return response()->json(['fllag'=>true ,'message'=>'data saved successfully']);
     }
 }

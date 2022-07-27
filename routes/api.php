@@ -87,3 +87,4 @@ Route::post('privacy',[AdminController::class,'privacy'])->name('privacy');
 // ----- store bank detail -------//  
 
 Route::post('addbank',[AgentController::class,'addbank'])->name('addbank');  
+Route::post('getbank',[AgentController::class,'getbank'])->name('getbank');  
