@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator; 
 use DB;
 use App\Services\FCMService;
+use Razorpay\Api\Api as RazorpayApi;
 
 
 class ConfirmedSeatController extends Controller
@@ -131,6 +132,18 @@ class ConfirmedSeatController extends Controller
             return response()->json(['flag'=>false,'message'=>'someone processing for seats '.implode(' & ',$repq1).'  wait...']);    
         }
 
+        /****Razorpay create order****/
+        $rapi = new RazorpayApi(env('RAZORPAY_KEY_ID'),env('RAZORPAY_KEY_SECRET'));
+
+        $razorpayOrderData = [
+            'receipt'         => $request->user_id.'_'.time(),
+            'amount'          => $request->total_amount*100,
+            'currency'        => 'INR'
+        ];
+
+        $razorpayOrder = $rapi->order->create($razorpayOrderData);
+        /****Razorpay create order****/
+
         $cbookbus = new ConfirmedSeat();
         $cbookbus->bus_id = $request->bus_id;
         $cbookbus->passenger_name = $request->passenger_name;
@@ -151,6 +164,7 @@ class ConfirmedSeatController extends Controller
         $cbookbus->date = $request->date;
         $cbookbus->seatNo = json_encode($request->selected_seats);
         $cbookbus->total_amount = $request->total_amount;
+        $cbookbus->razorpay_order_id = $razorpayOrder['id'];
         $cbookbus->status = '0';
         $cbookbus->user_type = $request->user_type;
         $cbookbus->payment_status = "0";
@@ -160,6 +174,7 @@ class ConfirmedSeatController extends Controller
         }
         $cbookbus->save();  
         $bus_agent = Bus::find($cbookbus->bus_id);
+        
         if ($request->user_type == "1") {
             $agent = Agent::find($request->user_id);
                     
