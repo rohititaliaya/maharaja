@@ -117,6 +117,14 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="{{ url('payment') }}" class="nav-link">
+              <i class="fas fa-money-check-alt fa-lg"></i>
+              <p>
+                  Payment
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{ url('policy') }}" class="nav-link">
               <i class="fas fa-cog fa-lg"></i>
               <p>
@@ -194,6 +202,11 @@
     @if (session('success'))
     <div class="alert alert-success mx-5">
         {{ session('success') }}
+    </div>
+    @endif
+    @if (session('error'))
+    <div class="alert alert-danger mx-5">
+        {{ session('error') }}
     </div>
     @endif
     <main class="px-4">
