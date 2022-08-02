@@ -8,6 +8,7 @@ use App\Models\Agent;
 use DataTables;
 use App\Services\FCMService;
 use Session;
+use Validator;
 
 class AgentController extends Controller
 {
@@ -71,6 +72,18 @@ class AgentController extends Controller
             ]
         );
         return redirect()->back()->with('success', 'request approved successfully');
+    }
+
+    public function razorpayIdUpdate(Request $request)
+    {
+        if(empty($request->razorpay_acc_id))
+        {
+            return redirect()->back()->with('error','Razorpay Acc Id Required!');
+        }
+        $agent = Agent::findOrFail($request->id);
+
+        $agent->update($request->only('razorpay_acc_id'));
+        return redirect()->back()->with('success','Razorpay Acc Id updated successfully');
     }
 
     /**

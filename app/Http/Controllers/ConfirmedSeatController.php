@@ -15,10 +15,12 @@ use App\Models\Agent;
 use App\Models\User;
 use App\Models\DatePrice;
 use App\Models\Routes;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator; 
 use DB;
 use App\Services\FCMService;
+use Razorpay\Api\Api as RazorpayApi;
 
 
 class ConfirmedSeatController extends Controller
@@ -131,6 +133,18 @@ class ConfirmedSeatController extends Controller
             return response()->json(['flag'=>false,'message'=>'someone processing for seats '.implode(' & ',$repq1).'  wait...']);    
         }
 
+        /****Razorpay create order****/
+        $rapi = new RazorpayApi(env('RAZORPAY_KEY_ID'),env('RAZORPAY_KEY_SECRET'));
+
+        $razorpayOrderData = [
+            'receipt'         => $request->user_id.'_'.time(),
+            'amount'          => $request->total_amount*100,
+            'currency'        => 'INR'
+        ];
+
+        $razorpayOrder = $rapi->order->create($razorpayOrderData);
+        /****Razorpay create order****/
+
         $cbookbus = new ConfirmedSeat();
         $cbookbus->bus_id = $request->bus_id;
         $cbookbus->passenger_name = $request->passenger_name;
@@ -151,6 +165,7 @@ class ConfirmedSeatController extends Controller
         $cbookbus->date = $request->date;
         $cbookbus->seatNo = json_encode($request->selected_seats);
         $cbookbus->total_amount = $request->total_amount;
+        $cbookbus->razorpay_order_id = $razorpayOrder['id'];
         $cbookbus->status = '0';
         $cbookbus->user_type = $request->user_type;
         $cbookbus->payment_status = "0";
@@ -160,6 +175,7 @@ class ConfirmedSeatController extends Controller
         }
         $cbookbus->save();  
         $bus_agent = Bus::find($cbookbus->bus_id);
+        
         if ($request->user_type == "1") {
             $agent = Agent::find($request->user_id);
                     
@@ -403,6 +419,9 @@ class ConfirmedSeatController extends Controller
             $cs->delete();
             return response()->json(['flag'=>true, 'message'=>'Payment Failed !']);
         }else{
+            // $p = Payment::where('transaction_id');
+            // if(!empty($p))
+            //     return response()->json(['flag'=>false,'message'=>'Transaction id already in use!']);
             $p = new Payment();
             $p->book_id = $request->book_id;
             $p->user_id = $request->user_id;
@@ -468,6 +487,74 @@ class ConfirmedSeatController extends Controller
                         ]
                     );
                 }   
+
+                /*****Create Transfer from razorpay*****/
+                $api = new RazorpayApi(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
+
+                $paymentDtl = $api->payment->fetch($request->transaction_id);
+
+                if($paymentDtl->status=='captured')
+                {
+                    if(count($transfers = $paymentDtl->transfers())>0)
+                        return response()->json(['flag'=>true,'message'=>'Transfer alreay exist for given payment Id!','data'=>$transfers->items[0]->toArray()]);
+                        // dd($transfers->items[0]->id);   
+
+                    $cs = ConfirmedSeat::find($request->book_id);
+                    $bus = [];
+                    $agent = [];
+                    if(empty($bus = $cs->bus))
+                    {
+                        return response()->json(['flag'=>false, 'message'=>'Bus not found related to booking id!']);  
+                    }
+
+                    if(empty($agent = $cs->bus->agent))
+                    {
+                        return response()->json(['flag'=>false, 'message'=>'Agent not found related to booking id!']);  
+                    }
+                    $amount = $cs->total_amount;
+                    $commission_rate = json_decode(Setting::find(1)->values)->commission_rate;
+
+                    $payable = $amount-($amount*$commission_rate/100);
+                    $date = Carbon::create($cs->date.' '.$cs->pick_time);
+                    $onHold = 1;
+                    $timestamp = $date->timestamp;
+                    if($date->lt(Carbon::now()))
+                    {
+                        $onHold = 0;
+                        $timestamp = null;
+                    }
+                    $array = [
+                        'transfers' => [
+                            [
+                                'account'=> $agent->razorpay_acc_id, 
+                                'amount'=> $payable*100, 
+                                'currency'=>'INR', 
+                                'notes'=> [
+                                    'name'=>$agent->name, 
+                                    'contact'=>$agent->mobile
+                                ], 
+                            // 'linked_account_notes'=>array('branch'), 
+                                'on_hold'=>$onHold, 
+                                'on_hold_until'=>$timestamp
+                            ],
+                        ]
+                    ];
+
+                    try
+                    {
+                        $transfer = $api->payment->fetch($request->transaction_id)->transfer($array);
+                    }
+                    catch(\Exception $e)
+                    {
+                        return response()->json(["flag"=>false,"message"=>$e->getMessage()]);
+                    }
+                    $p->agent_id = $agent->id;
+                    $p->transfer_id = $transfer->items[0]->id;
+                    $p->transfer_on_hold = $onHold;
+                    $p->transfer_hold_till = $date;
+                    $p->save();
+
+                }
                 
                 return response()->json(['flag'=>true, 'message'=>'stored successfully!']);    
             }else{
