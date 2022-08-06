@@ -30,6 +30,14 @@
                 <input type="text" name="commission_rate" id="commission_rate" class="form-control" value="{{$setting->commission_rate}}" required>
             </div>
             <div class="modal-body">
+                <label for="commission_rate">Tax rate(%):</label>
+                <input type="text" name="tax_rate" id="tax_rate" class="form-control" value="{{$setting->tax_rate ?? ''}}" required>
+            </div>
+            <div class="modal-body">
+                <label for="commission_rate">Cancelation charge(%):</label>
+                <input type="text" name="cancelation_charge" id="cancelation_charge" class="form-control" value="{{$setting->cancelation_charge ?? ''}}" required>
+            </div>
+            <div class="modal-body">
                 <label for="admin_user">Admin Username:</label>
                 <input type="text" name="admin_user" id="admin_user" class="form-control" value="{{$setting->admin_user}}" required>
             </div>

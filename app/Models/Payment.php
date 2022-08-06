@@ -13,10 +13,16 @@ class Payment extends Model
         'user_id',
         'transaction_id',
         'status',
+        'payment_status',
+        'total_amount',
+        'amount_without_tax',
+        'transfered_amount',
+        'refunded_amount',
         'agent_id',
         'transfer_id',
         'transfer_on_hold',
-        'transfer_hold_till'
+        'transfer_hold_till',
+        'refund_obj'
     ];
 
     public function book()

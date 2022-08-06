@@ -306,6 +306,74 @@
             </div>
           </div>
           <!-- ./col -->
+
+          <!-- ./col -->
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>&#8377;{{ $array['received_amount'] }}</h3>
+
+                <p>Total Amount Recieved</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-money-check-alt"></i>
+              </div>
+              {{-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> --}}
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <!-- ./col -->
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>&#8377;{{ $array['amount_without_tax'] }}</h3>
+
+                <p>Amount Recieved without Tax</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-money-check-alt"></i>
+              </div>
+              {{-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> --}}
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <!-- ./col -->
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>&#8377;{{ $array['refund'] }}</h3>
+
+                <p>Total Refund</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-money-check-alt"></i>
+              </div>
+              {{-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> --}}
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <!-- ./col -->
+          <div class="col-lg-6 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>&#8377;{{ $array['profit'] }}</h3>
+
+                <p>Total Profit</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-money-check-alt"></i>
+              </div>
+              {{-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> --}}
+            </div>
+          </div>
+          <!-- ./col -->
         </div>
         <!-- /.row -->
       </div>

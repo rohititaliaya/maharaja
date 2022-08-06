@@ -10,7 +10,9 @@ use App\Models\Setting;
 use App\Models\Agent;
 use App\Models\ConfirmedSeat;
 use App\Models\User;
+use App\Models\Payment;
 use Session;
+use DB;
 
 class AdminController extends Controller
 {
@@ -36,11 +38,19 @@ class AdminController extends Controller
         $agents = Agent::all()->count();
         $users = User::all()->count();
         $cbs = ConfirmedSeat::all()->count();
+        $received_amount = Payment::sum('total_amount');
+        $amount_without_tax = Payment::sum('amount_without_tax');
+        $refund = Payment::sum('refunded_amount');
+        $profit = Payment::query()->get([DB::raw('SUM(IF(payment_status=3,amount_without_tax-refunded_amount,IF(transfered_amount IS NULL,amount_without_tax,amount_without_tax-transfered_amount))) AS sum')]);
         $array = [
             'total_buses' => $buses,
             'total_agents' =>$agents,
             'total_users' => $users,
-            'current_bookings' => $cbs
+            'current_bookings' => $cbs,
+            'received_amount' => $received_amount,
+            'amount_without_tax' => $amount_without_tax,
+            'refund' => $refund,
+            'profit' => $profit[0]->sum,
         ];
         // return $array;
         return view('welcome', compact('array'));
@@ -82,6 +92,9 @@ class AdminController extends Controller
             'mobile' => $m->mobile,
             'privacy_policy'=> $m->privacy_policy,
             'razorpay_apikey'=> $m->razorpay_apikey,
+            'commission_rate'=> $m->commission_rate,
+            'tax_rate'=> $m->tax_rate,
+            'cancelation_charge'=> $m->cancelation_charge
         ];
         return $array;
     }

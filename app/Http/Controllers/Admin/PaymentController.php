@@ -29,8 +29,22 @@ class PaymentController extends Controller
     {
         if ($request->ajax()) {
             $data = Payment::select('*')->with(['book','agent']);
+            $commission_rate = json_decode(Setting::find(1)->values)->commission_rate;
+            $tax_rate = json_decode(Setting::find(1)->values)->tax_rate;
             return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('payment_status',function($data){
+                if($data->payment_status==0)
+                    return '<span class="badge bg-danger">Not Paid</span>';
+                else if($data->payment_status==1)
+                    return '<span class="badge bg-info">Captured</span>';
+                else if($data->payment_status==2)
+                    return '<span class="badge bg-success">Transfered</span>';
+                else if($data->payment_status==3)
+                    return '<span class="badge bg-warning">Refunded</span>';
+                else
+                    return '<span class="badge bg-secondary">Unknow Status</span>';
+            })
             ->addColumn('on_hold',function($data){
                 if($data->transfer_on_hold==1)
                     return '<span class="text-success">Yes</span>';
@@ -50,12 +64,14 @@ class PaymentController extends Controller
                     return '-';
             })
             ->addColumn('action',function($data){
-                if(empty($data->transfer_id))
+                if(empty($data->transfer_id) && $data->payment_status<2)
                     return '<form method="post" action="'.route('payment.transfer',$data->id).'"><input type="hidden" name="_token" value="'.csrf_token().'"><button type="submit" class="btn btn-success btn-sm">Retry Transfer</button></form>';
+                else if(empty($data->transfer_id) && $data->payment_status==3)
+                    return '<span class="text-success">Refunded</span>';
                 else
                     return '<span class="text-success">Already Transfered</span>';
             })
-            ->rawColumns(['on_hold','action'])
+            ->rawColumns(['payment_status','on_hold','action'])
             ->make(true);
         }
         return view('payment.index');
@@ -95,7 +111,11 @@ class PaymentController extends Controller
             $amount = $cs->total_amount;
             $commission_rate = json_decode(Setting::find(1)->values)->commission_rate;
 
-            $payable = $amount-($amount*$commission_rate/100);
+            $tax_rate = json_decode(Setting::find(1)->values)->tax_rate;
+
+            $amount_without_tax = round($amount*100/(100+$tax_rate),2);
+
+            $payable = round($amount_without_tax-($amount_without_tax*$commission_rate/100),2);
             $date = Carbon::create($cs->date.' '.$cs->pick_time);
             $onHold = 1;
             $timestamp = $date->timestamp;
@@ -128,6 +148,10 @@ class PaymentController extends Controller
             {
                 return redirect()->back()->with('error',$e->getMessage());
             }
+            $payment->payment_status=2;
+            $payment->total_amount=$cs->total_amount;
+            $payment->amount_without_tax=$amount_without_tax;
+            $payment->transfered_amount=$payable;
             $payment->agent_id = $agent->id;
             $payment->transfer_id = $transfer->items[0]->id;
             $payment->transfer_on_hold = $onHold;
@@ -138,7 +162,6 @@ class PaymentController extends Controller
 
         }
         return redirect()->back()->with('error','Payment status is not Captured, Cannot transfer payment!');
-        dd($paymentDtl);
 
     }
 

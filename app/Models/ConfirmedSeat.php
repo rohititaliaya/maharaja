@@ -25,4 +25,9 @@ class ConfirmedSeat extends Model
         $city = City::find($value);
         return $city->name;
     }
+
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class, 'id', 'book_id');
+    }
 }

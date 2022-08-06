@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use DB;
 use App\Services\FCMService;
 use Razorpay\Api\Api as RazorpayApi;
+use Illuminate\Support\Facades\Log;
 
 
 class ConfirmedSeatController extends Controller
@@ -351,7 +352,38 @@ class ConfirmedSeatController extends Controller
             }
             if($confirm_seat){
                 $confirm_seat->status = '0';
-                $confirm_seat->save();            
+                $confirm_seat->save();
+
+                /*****Processing Refunds*****/
+                if(!empty($confirm_seat->payment))
+                {
+                    $api = new RazorpayApi(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
+
+                    $cancelation_charge = json_decode(Setting::find(1)->values)->cancelation_charge;
+                    $tax_rate = json_decode(Setting::find(1)->values)->tax_rate;
+                    $amount = $confirm_seat->total_amount;
+
+                    $amount_without_tax = round($amount*100/(100+$tax_rate),2);
+
+                    $refundable = round($amount_without_tax-($amount_without_tax*$cancelation_charge/100),2);
+
+                    $razorRefund = [];
+                    try
+                    {
+                        $razorRefund = $api->payment->fetch($confirm_seat->payment->transaction_id)->refund(array('amount'=> $refundable*100,'reverse_all'=>'1'));
+                    }
+                    catch(\Exception $e)
+                    {
+                        Log::error("Razorpay: ".$e->getMessage());
+                        return response()->json(["flag"=>false,"message"=>'Error while creating Razorpay Refund! ']);
+                    }
+                    $confirm_seat->payment->update([
+                        'payment_status'=>3,
+                        'refunded_amount'=> $refundable,
+                        'refund_obj'=>json_encode($razorRefund->toArray())]);
+                }
+                
+                /*****Processing Refunds*****/           
                 
                 // counting seats array
                 $ccseat = DB::table('confirmed_seats')->where('id', '=', $confirm_seat->id)->first();
@@ -372,7 +404,7 @@ class ConfirmedSeatController extends Controller
                 }
                 $date_price_seats->seats_avail = $date_price_seats->seats_avail + $total_count;
                 $date_price_seats->save(); 
-                
+
                 $bus_agent = Bus::find($ccseat->bus_id);
                 if ($ccseat->user_type == '1') {
                     $agents = Agent::find($bus_agent->agent_id);
@@ -425,7 +457,7 @@ class ConfirmedSeatController extends Controller
             $p = new Payment();
             $p->book_id = $request->book_id;
             $p->user_id = $request->user_id;
-            $p->status = $request->status;  
+            $p->status = $request->status; 
             if ($request->has('transaction_id')) {
                 $p->transaction_id = $request->transaction_id; 
             }
@@ -495,6 +527,8 @@ class ConfirmedSeatController extends Controller
 
                 if($paymentDtl->status=='captured')
                 {
+                    $p->update(['payment_status' => 1]);
+
                     if(count($transfers = $paymentDtl->transfers())>0)
                         return response()->json(['flag'=>true,'message'=>'Transfer alreay exist for given payment Id!','data'=>$transfers->items[0]->toArray()]);
                         // dd($transfers->items[0]->id);   
@@ -513,8 +547,15 @@ class ConfirmedSeatController extends Controller
                     }
                     $amount = $cs->total_amount;
                     $commission_rate = json_decode(Setting::find(1)->values)->commission_rate;
+                    $tax_rate = json_decode(Setting::find(1)->values)->tax_rate;
 
-                    $payable = $amount-($amount*$commission_rate/100);
+                    $amount_without_tax = round($amount*100/(100+$tax_rate),2);
+
+                    $p->total_amount = $cs->total_amount;
+                    $p->amount_without_tax = $amount_without_tax;
+                    $p->save();
+
+                    $payable = round($amount_without_tax-($amount_without_tax*$commission_rate/100),2);
                     $date = Carbon::create($cs->date.' '.$cs->pick_time);
                     $onHold = 1;
                     $timestamp = $date->timestamp;
@@ -546,12 +587,15 @@ class ConfirmedSeatController extends Controller
                     }
                     catch(\Exception $e)
                     {
-                        return response()->json(["flag"=>false,"message"=>$e->getMessage()]);
+                        Log::error("Razorpay: ".$e->getMessage());
+                        return response()->json(["flag"=>false,"message"=>'Error while creating Razorpay transfer! ']);
                     }
+                    $p->payment_status = 2;
                     $p->agent_id = $agent->id;
                     $p->transfer_id = $transfer->items[0]->id;
                     $p->transfer_on_hold = $onHold;
                     $p->transfer_hold_till = $date;
+                    $p->transfered_amount = $payable;
                     $p->save();
 
                 }
