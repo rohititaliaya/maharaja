@@ -142,12 +142,20 @@ class AgentController extends Controller
             # code...
             $bk = BankDetail::where('agent_id', $request->agent_id)->first();
             if ($bk) {
-                return response()->json(['flag'=>true ,'message'=>$bk]);
+                $m = [
+                    'agent_id'=>$bk->agent_id,
+                    'account_number'=>$bk->getRawOriginal('account_number'),
+                    'banificary_name'=>$bk->getRawOriginal('banificary_name'),
+                    'ifsc_code'=>$bk->getRawOriginal('ifsc_code'),
+                    'bank_name'=>$bk->getRawOriginal('bank_name'),
+                    'city_name'=>$bk->getRawOriginal('city_name')
+                    ];
+                return response()->json(['flag'=>true ,'data'=>$m]);
             }else{
-                return response()->json(['flag'=>true ,'message'=>'data not found']);
+                return response()->json(['flag'=>false ,'message'=>'data not found']);
             }
         }else{
-            return response()->json(['flag'=>true ,'message'=>'agent_id is null']);
+            return response()->json(['flag'=>false ,'message'=>'agent_id is null']);
         }
     }
 
