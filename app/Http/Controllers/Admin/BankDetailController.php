@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBankDetailRequest;
 use App\Http\Requests\UpdateBankDetailRequest;
 use Illuminate\Http\Request;
 use App\Models\BankDetail;
+use App\Models\Bus;
 use DataTables;
 use App\Services\FCMService;
 use Session;
@@ -31,15 +32,21 @@ class BankDetailController extends Controller
             $data = BankDetail::select('*')->with('agent');
             return DataTables::of($data)
             ->addIndexColumn()
+            ->addColumn('buses', function($row){
+                $buses = Bus::where('agent_id', $row->agent_id)->pluck('travels_name');
+                $mstring = '';
+                $cnt = 0;
+                foreach($buses as $value){
+                    $cnt++;
+                    $mstring .=$cnt.'. '.$value.'<br>';
+                }
+                return $mstring;
+            })
             ->addColumn('action', function($row){
-                    if ($row->status == "0") {
-                        $btn = '<a href="/agent/agent-approve/'.$row->id.'" class="edit btn btn-info btn-sm"> Approve</a>';
-                    }else{
-                        $btn = '<a href="/agent/agent-dis-approve/'.$row->id.'" class="edit btn btn-danger btn-sm">Dis-Approve</a>';
-                    }
+                    $btn = '<a href="/agent/bank/'.$row->id.'/edit" class="edit btn btn-info btn-sm"> Edit</a>';
                     return $btn;
                 })
-            ->rawColumns(['action'])
+            ->rawColumns(['buses','action'])
             ->make(true);
         }
         return view('bank.index');
@@ -83,9 +90,24 @@ class BankDetailController extends Controller
      * @param  \App\Models\BankDetail  $bankDetail
      * @return \Illuminate\Http\Response
      */
-    public function edit(BankDetail $bankDetail)
+    public function edit($id)
     {
-        //
+        
+        $bk = BankDetail::find($id);
+        $bank = [
+            'id' => $bk->id,
+            'agent_id'=>$bk->agent_id,
+            'account_number'=>$bk->getOriginal('account_number'),
+            'banificary_name'=>$bk->getOriginal('banificary_name'),
+            'ifsc_code'=>$bk->getOriginal('ifsc_code'),
+            'bank_name'=>$bk->getOriginal('bank_name'),
+            'city_name'=>$bk->getOriginal('city_name'),
+            'mobile'=>$bk->getOriginal('mobile'),
+            'email' => $bk->getOriginal('email'),
+            'ac_type' => $bk->getOriginal('ac_type')
+        ];
+        return view('bank.edit', compact('bank'));
+        //dd($bank);
     }
 
     /**
@@ -95,9 +117,20 @@ class BankDetailController extends Controller
      * @param  \App\Models\BankDetail  $bankDetail
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateBankDetailRequest $request, BankDetail $bankDetail)
+    public function update(Request $request, $id)
     {
-        //
+        $bank = BankDetail::find($id);
+        $bank->account_number = $this->encrypt($request->account_number);
+        $bank->banificary_name = $this->encrypt($request->banificary_name);
+        $bank->ifsc_code = $this->encrypt($request->ifsc_code);
+        $bank->bank_name = $this->encrypt($request->bank_name);
+        $bank->city_name = $this->encrypt($request->city_name);
+        $bank->ac_type = $this->encrypt($request->ac_type);
+        $bank->mobile = $this->encrypt($request->mobile);
+        $bank->email = $this->encrypt($request->email);
+        $bank->save();
+        return redirect()->route('agent.bank')->with('success', 'bank detail updated successfully !');
+        
     }
 
     /**
@@ -109,5 +142,14 @@ class BankDetailController extends Controller
     public function destroy(BankDetail $bankDetail)
     {
         //
+    }
+    
+    public function encrypt($value)
+    {
+          $key ='maharaja@atul#cn';
+          $iv=   'encryptionIntVec';       
+          $res  =   openssl_encrypt($value, 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
+          $res2 = base64_encode($res);
+          return $res2;
     }
 }

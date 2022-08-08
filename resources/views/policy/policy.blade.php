@@ -44,6 +44,8 @@
             <div class="modal-body">
                 <label for="admin_pass">Admin Password:</label>
                 <input type="password" name="admin_pass" id="admin_pass" class="form-control" value="{{$setting->admin_pass}}" required>
+                <input type="checkbox" onclick="Toggle()">
+                <b>Show Password</b>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-info">Update</button>
@@ -53,4 +55,16 @@
             
     </div>
 </div>
+<script>
+    // Change the type of input to password or text
+        function Toggle() {
+            var temp = document.getElementById("admin_pass");
+            if (temp.type === "password") {
+                temp.type = "text";
+            }
+            else {
+                temp.type = "password";
+            }
+        }
+</script>
 @endsection

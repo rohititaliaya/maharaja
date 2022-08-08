@@ -10,11 +10,16 @@
             <tr>
                 <th>Id</th>
                 <th>Agent Name</th>
+                <th>Buses</th>
                 <th>Account Number</th>
                 <th>Banificary Name</th>
                 <th>IFSC Code</th>
                 <th>Bank Name</th>
                 <th>City Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Account Type</th>
+                <th>Action</th>
             </tr>
             </thead>
         </table>
@@ -31,12 +36,16 @@
           columns: [
                 {data: 'id', name: 'id'},
                 {data: 'agent.name', name: 'agent.name'},
+                {data: 'buses', name: 'buses'},
                 {data: 'account_number', name: 'account_number'},
                 {data: 'banificary_name', name: 'banificary_name'},
                 {data: 'ifsc_code', name: 'ifsc_code'},
                 {data: 'bank_name', name: 'bank_name'},
                 {data: 'city_name', name: 'city_name'},
-                // {data: 'action', name: 'action'}
+                {data: 'email', name: 'email'},
+                {data: 'mobile', name: 'mobile'},
+                {data: 'ac_type', name: 'ac_type'},
+                {data: 'action', name: 'action'}
           ]
       });
 

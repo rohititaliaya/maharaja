@@ -136,6 +136,7 @@ class AgentController extends Controller
     {
         //
     }
+    
     public function getbank(Request $request)
     {
         if (request()->agent_id) {
@@ -148,7 +149,10 @@ class AgentController extends Controller
                     'banificary_name'=>$bk->getRawOriginal('banificary_name'),
                     'ifsc_code'=>$bk->getRawOriginal('ifsc_code'),
                     'bank_name'=>$bk->getRawOriginal('bank_name'),
-                    'city_name'=>$bk->getRawOriginal('city_name')
+                    'city_name'=>$bk->getRawOriginal('city_name'),
+                    'mobile'=>$bk->getRawOriginal('mobile'),
+                    'email' => $bk->getRawOriginal('email'),
+                    'ac_type' => $bk->getRawOriginal('ac_type')
                     ];
                 return response()->json(['flag'=>true ,'data'=>$m]);
             }else{
@@ -167,8 +171,6 @@ class AgentController extends Controller
         // $datapost = 'post elemetns';
         // $cipher = openssl_encrypt(json_encode($datapost,true), 'AES-128-CBC', $key, $options=OPENSSL_RAW_DATA, $iv);
         // $body = base64_encode($cipher);
-
-        //----- saving the bank --------//
         $bk = BankDetail::where('agent_id', $request->agent_id)->first();
         if ($bk) {
             $bk->account_number = $request->account_number;
@@ -178,6 +180,8 @@ class AgentController extends Controller
             $bk->city_name = $request->city_name;
             $bk->city_name = $request->city_name;
             $bk->mobile = $request->mobile;
+            $bk->email = $request->email;
+            $bk->ac_type = $request->ac_type;
             $bk->save();
             return response()->json(['flag'=>true ,'message'=>'data updated successfully']);
         }else{
@@ -189,9 +193,10 @@ class AgentController extends Controller
             $bank->bank_name = $request->bank_name;
             $bank->city_name = $request->city_name;
             $bank->mobile = $request->mobile;
+            $bank->email = $request->email;
+            $bank->ac_type = $request->ac_type;
             $bank->save();
             return response()->json(['flag'=>true ,'message'=>'data saved successfully']);
         }
-
     }
 }

@@ -23,6 +23,8 @@ return new class extends Migration
             $table->text('bank_name');
             $table->text('city_name');
             $table->text('mobile');
+            $table->string('email');
+            $table->string('ac_type');
             $table->timestamps();
         });
     }
