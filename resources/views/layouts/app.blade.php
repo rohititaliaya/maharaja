@@ -17,6 +17,19 @@
   {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> --}}
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+  {{-- <style>
+    #laravel_datatable {
+      table-layout: fixed;
+      width: 100% !important;
+    }
+    #laravel_datatable td,
+    #laravel_datatable th{
+      width: auto !important;
+      white-space: normal;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  </style> --}}
 </head>
 <!--
 `body` tag options:

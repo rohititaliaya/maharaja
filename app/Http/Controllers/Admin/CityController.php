@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\City;
 use DataTables;
 use Session;
+use DB;
 
 class CityController extends Controller
 {
@@ -29,11 +30,7 @@ class CityController extends Controller
             ->addIndexColumn()
             ->addColumn('action', function($row){
                     $btn = '<div class="d-flex"> <a href="city/'.$row->id.'/edit" class="btn btn-primary btn-sm mx-2">Edit</a>';
-                    $btn = $btn.'<form action="city/'.$row->id.'" method="POST">
-                     '.csrf_field().'
-                     '.method_field("POST").'
-                     <button type="submit" class="btn btn-danger">Delete</button>
-                    </form></div>';
+                    $btn = $btn.'<button type="button" class="btn btn-danger" data-toggle="modal" id="deleteid" data-target="#deleteAlert" data-id="'.$row->id.'">Delete</button></div>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
@@ -114,6 +111,7 @@ class CityController extends Controller
      */
     public function destroy($request)
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');   
         $city = City::find(request()->id);
         $city->delete();
         

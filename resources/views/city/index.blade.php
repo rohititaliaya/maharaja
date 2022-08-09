@@ -38,23 +38,53 @@
         </form>
             </div>
         </div>  
+        
+        <!-- Modal -->
+        <div id="deleteAlert" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+        <form action="" method="post" id="deleteform">
+            @method('POST')
+            @csrf
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete City</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Are you sure ?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-info">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+            </div>
+        </div>  
     </div>
 </div>
 
 <script type="text/javascript">
     $(function () {
 
-      var table = $('#laravel_datatable').DataTable({
-          processing: true,
-          serverSide: true,
-          ajax: "{{ route('city') }}",
-          columns: [
-                {data: 'id', name: 'id'},
-                {data: 'name', name: 'name'},
-                {data: 'action', name: 'action'}
-          ]
-      });
-
+          var table = $('#laravel_datatable').DataTable({
+              processing: true,
+              serverSide: true,
+              ajax: "{{ route('city') }}",
+              columns: [
+                    {data: 'id', name: 'id'},
+                    {data: 'name', name: 'name'},
+                    {data: 'action', name: 'action'}
+              ]
+          });
+      
+         $(document).on("click", "#deleteid", function () {
+            var id = $(this).data('id');
+            $('#deleteform').attr('action', 'city/'+id);
+         });
     });
+    
+   
   </script>
+  
 @endsection
