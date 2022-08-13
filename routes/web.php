@@ -43,6 +43,12 @@ Route::get('date-price', [App\Http\Controllers\Admin\DatePriceController::class,
 Route::get('drop-point', [App\Http\Controllers\Admin\DropPointController::class, 'index'])->name('drop-point');
 Route::get('payment', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payment');
 Route::post('payment/transfer/{payment}',[App\Http\Controllers\Admin\PaymentController::class,'paymentTransfer'])->name('payment.transfer');
+/*****Razor Webhooks*****/
+Route::post('payment/razorpay/webhook/refundSettled',[App\Http\Controllers\Admin\RazorHookController::class,'refundSettled']);
+Route::post('payment/razorpay/webhook/transferSettled',[App\Http\Controllers\Admin\RazorHookController::class,'transferSettled']);
+Route::post('payment/razorpay/webhook/settlement-processed',[App\Http\Controllers\Admin\RazorHookController::class,'settlementProcessed']);
+/*****Razor Webhooks*****/
+
 Route::get('pickup-point', [App\Http\Controllers\Admin\PickupPointController::class, 'index'])->name('pickup-point');
 Route::get('route', [App\Http\Controllers\Admin\RouteController::class, 'index'])->name('route');
 Route::get('seat', [App\Http\Controllers\Admin\SeatController::class, 'index'])->name('seat');
