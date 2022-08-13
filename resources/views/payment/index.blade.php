@@ -9,6 +9,7 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Booking Id</th>
                 <th>Payment Id</th>
                 <th>Payment Status</th>
                 <th>Total Amount</th>
@@ -30,9 +31,23 @@
       var table = $('#laravel_datatable').DataTable({
           processing: true,
           serverSide: true,
+          responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.modal( {
+                    header: function ( row ) {
+                        var data = row.data();
+                        return 'Details for Book Id: '+data['book_id'];
+                    }
+                } ),
+                renderer: $.fn.dataTable.Responsive.renderer.tableAll( {
+                    tableClass: 'table'
+                } )
+            }
+        },
           ajax: "{{ route('payment') }}",
           columns: [
                 {data: 'id', name: 'id'},
+                {data: 'book_id', name: 'book_id'},
                 {data: 'transaction_id', name: 'transaction_id'},
                 {data: 'payment_status', name: 'payment_status'},
                 {data: 'total_amount', name: 'total_amount'},

@@ -11,6 +11,7 @@ use Razorpay\Api\Api as RazorpayApi;
 use DataTables;
 use Session;
 use Carbon\Carbon;
+use Log;
 
 class PaymentController extends Controller
 {
@@ -81,7 +82,15 @@ class PaymentController extends Controller
     {
         $api = new RazorpayApi(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
 
-        $paymentDtl = $api->payment->fetch($payment->transaction_id);
+        try
+        {
+            $paymentDtl = $api->payment->fetch($payment->transaction_id);
+        }
+        catch(\Exception $e)
+        {
+            Log::error("Razorpay: ".$e->getMessage());
+            return redirect()->back()->with("error",'Error while creating Razorpay transfer! ');
+        }
 
         if($paymentDtl->status=='captured')
         {
