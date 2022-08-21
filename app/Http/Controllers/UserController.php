@@ -39,7 +39,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $is_agent = Agent::where('mobile', $request->mobile)->first();
+        $is_agent = Agent::where('mobile', $request->mobile)->where('status','1')->first();
         if (!$is_agent) {
             
             $user = User::where('mobile', $request->mobile)->first();
@@ -57,7 +57,7 @@ class UserController extends Controller
                 return response()->json(['flag'=>true,'message'=>'Record Created Successfully','data'=>$user]);
             }
         }else{
-            return response()->json(['flag'=>false,'message'=>'Already have agent account']);
+            return response()->json(['flag'=>false,'message'=>'Already have approved agent account']);
         }
     }
 

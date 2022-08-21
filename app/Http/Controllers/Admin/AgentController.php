@@ -5,10 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Agent;
+use App\Models\ConfirmedSeat;
+use App\Models\BankDetail;
+use App\Models\Bus;
+use App\Models\DropPoints;
+use App\Models\PickupPoints;
+use App\Models\Routes;
+use App\Models\DatePrice;
 use DataTables;
 use App\Services\FCMService;
 use Session;
 use Validator;
+use DB;
 
 class AgentController extends Controller
 {
@@ -31,10 +39,12 @@ class AgentController extends Controller
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('action', function($row){
+                    $btn = '';
                     if ($row->status == "0") {
-                        $btn = '<a href="/agent/agent-approve/'.$row->id.'" class="edit btn btn-info btn-sm"> Approve</a>';
+                        $btn = '<a href="/agent/agent-approve/'.$row->id.'" class="edit btn btn-info btn-sm mx-2"> Approve</a>';
+                        $btn = $btn.'<a href class="btn btn-sm btn-danger deleteModal" data-toggle="modal" data-target="#deleteAlert" data-id="'.$row->id.'">Delete</button></a>';
                     }else{
-                        $btn = '<a href="/agent/agent-dis-approve/'.$row->id.'" class="edit btn btn-danger btn-sm">Dis-Approve</a>';
+                        $btn = '<a href="/agent/agent-dis-approve/'.$row->id.'" class="edit btn btn-danger btn-sm mx-2">Dis-Approve</a>';
                     }
                     return $btn;
                 })
@@ -62,6 +72,19 @@ class AgentController extends Controller
     public function DisApprove(Request $request)
     {
         $agent = Agent::find($request->id);
+
+        if(count($agent->buses)>0)
+        {
+            $buses = $agent->buses->pluck('id')->toArray();
+            $seats = ConfirmedSeat::whereIn('bus_id',$buses)
+                ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
+                ->get();
+            if(count($seats)>0)
+            {
+                return redirect()->back()->with('error','Dis-approval suspended, Agent\'s Bus(es) has confirmed tickets for upcoming Date and time');
+            }
+        }
+
         $agent->status = "0";
         $agent->save();
         FCMService::send(
@@ -147,8 +170,47 @@ class AgentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Agent $agent)
     {
-        //
+        $buses = [];
+        if(count($agent->buses)>0)
+            {
+            $buses = $agent->buses->pluck('id')->toArray();
+            $seats = ConfirmedSeat::whereIn('bus_id',$buses)
+                ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
+                ->get();
+            if(count($seats)>0)
+            {
+                return redirect()->back()->with('error','Deletion suspended, Agent\'s Bus(es) has confirmed tickets for upcoming Date and time');
+            }
+        }
+        FCMService::send(
+            $agent->fcmid,
+            [
+                'title' => 'Bus Booking',
+                'body' => 'Your account is Deleted !',
+            ]
+        );
+        $this->deleteAgentData($agent,$buses);
+        $agent->delete();
+        return redirect()->back()->with('success','Agent deleted successfully');
+    }
+
+    public function deleteAgentData(Agent $agent,$buses)
+    {
+        $status = BankDetail::where('agent_id',$agent->id)->delete();
+        if(!empty($buses))
+        {
+            $status = DropPoints::whereIn('bus_id',$buses)->delete();
+            $status = PickupPoints::whereIn('bus_id',$buses)->delete();
+            $routes = Routes::whereIn('bus_id',$buses)->get();
+            if(count($routes)>0)
+            {
+                $status = DatePrice::whereIn('route_id',$routes->pluck('id')->toArray())->delete();
+                $routes = Routes::whereIn('id',$routes->pluck('id')->toArray())->get();
+            }
+            $status = ConfirmedSeat::whereIn('bus_id',$buses)->delete();
+        }
+
     }
 }

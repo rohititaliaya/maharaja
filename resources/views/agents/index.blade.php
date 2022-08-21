@@ -25,6 +25,7 @@
         <!-- Modal content-->
         <div class="modal-content">
             <form action="{{route('agent.razorpayid.update')}}" method="post">
+                @method('post')
                 @csrf
             <div class="modal-header">
                 <h4 class="modal-title">Update Acc Id</h4>
@@ -43,10 +44,33 @@
                 <button type="submit" class="btn btn-primary">Save</button>
                 <button type="button" onclick="modalClose(this)" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
+            </form>
         </div>
 
     </div>
 </div>
+
+<div id="deleteAlert" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <form action="" method="post" id="deleteform">
+            @method('delete')
+            @csrf
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete Agent</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Are you sure ?</h3>
+                </div>
+                <div class="modal-footer">
+                <button type="submit" class="btn btn-info">Yes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>  
 
 <script type="text/javascript">
     $(function () {
@@ -77,7 +101,6 @@
 
     function razorpayAccIdEdit(obj)
     {
-        console.log($(obj));
         $('#razorpayAccIdModal .modal-title').html('Update Razorpay Acc Id('+$(obj).attr('data-name')+')');
         $('#razorpayAccIdModal input[name="id"]').val($(obj).attr('data-id'));
         $('#razorpayAccIdModal input[name="razorpay_acc_id"]').val($(obj).attr('data-razor-id'));
@@ -88,5 +111,10 @@
     {
         $(obj).closest('.modal').modal('hide');
     }
+
+    $(document).on("click", ".deleteModal", function () {
+        var id = $(this).data('id');
+        $('#deleteform').attr('action', 'agent/'+id+'/destroy');
+     });
   </script>
 @endsection

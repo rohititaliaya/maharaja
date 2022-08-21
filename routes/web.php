@@ -29,6 +29,7 @@ Route::get('agents', [App\Http\Controllers\Admin\AgentController::class, 'index'
 Route::get('agent/agent-approve/{id}', [App\Http\Controllers\Admin\AgentController::class, 'approve']);
 Route::get('agent/agent-dis-approve/{id}', [App\Http\Controllers\Admin\AgentController::class, 'DisApprove']);
 Route::post('agent/razorpay-id/update',[App\Http\Controllers\Admin\AgentController::class, 'razorpayIdUpdate'])->name('agent.razorpayid.update');
+Route::delete('agent/{agent}/destroy',[App\Http\Controllers\Admin\AgentController::class,'destroy'])->name('agent.destroy');
 Route::get('bus', [App\Http\Controllers\Admin\BusController::class, 'index'])->name('bus');
 
 #---------- city crud ----------#
