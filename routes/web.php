@@ -34,7 +34,7 @@ Route::get('bus', [App\Http\Controllers\Admin\BusController::class, 'index'])->n
 
 #---------- city crud ----------#
 Route::get('city', [App\Http\Controllers\Admin\CityController::class, 'index'])->name('city');
-Route::post('city/{id}', [App\Http\Controllers\Admin\CityController::class, 'distroy'])->name('city.distroy');
+Route::post('city/{id}', [App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('city.destroy');
 Route::post('savecity', [App\Http\Controllers\Admin\CityController::class, 'store'])->name('city.save');
 Route::get('city/{id}/edit', [App\Http\Controllers\Admin\CityController::class, 'edit'])->name('city.edit');
 Route::post('updatecity/{id}', [App\Http\Controllers\Admin\CityController::class, 'update'])->name('city.update');
