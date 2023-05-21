@@ -25,8 +25,8 @@ class DropPointsController extends Controller
     public function getDropPoints()
     {
          if (request()->agent_id) {
-            $buses = Bus::where('agent_id',request()->agent_id)->pluck('id')->toArray();
-            $buses_city = Bus::where('agent_id',request()->agent_id)->select(['id','travels_name','plat_no'])->get();
+            $buses = Bus::where('agent_id',request()->agent_id)->where('status','A')->pluck('id')->toArray();
+            $buses_city = Bus::where('agent_id',request()->agent_id)->where('status','A')->select(['id','travels_name','plat_no'])->get();
             $routes = Routes::whereIn('bus_id',$buses)->select('to','bus_id')->get();
             foreach ($buses_city as $key => $value) {
                foreach($routes as $frm){

@@ -9,6 +9,7 @@ use App\Models\Bus;
 use App\Models\DatePrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use DB;
 
 
 class RoutesController extends Controller
@@ -32,7 +33,14 @@ class RoutesController extends Controller
     {
         if (request()->bus_id) {
             $routes = Routes::where('bus_id', request()->bus_id)->first();
-            $dateprice = DatePrice::where('route_id', $routes->id)->get();
+            $dateprice = DatePrice::join('routes','date_prices.route_id','=','routes.id')
+                ->leftJoin('bus_inactive_dates',function($join){
+                $join->on('date_prices.date','=','bus_inactive_dates.date')
+                    ->on('routes.bus_id','=','bus_inactive_dates.bus_id');
+            })
+                ->where('routes.bus_id',request()->bus_id)
+                ->orderByRaw('STR_TO_DATE(date_prices.date,"%d-%b-%Y")')
+                ->get(['date_prices.id','date_prices.date','date_prices.price','date_prices.route_id','date_prices.seats_avail',DB::raw('IFNULL(bus_inactive_dates.status,"A") AS status')]);
             $routes['date_prices'] = $dateprice; 
             return response()->json(['flag'=>true,'message'=> 'success','data'=>$routes]);
         }else{

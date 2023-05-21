@@ -23,6 +23,7 @@ Route::post('storebuses',[BusController::class, 'store'])->name('buses');
 Route::post('filterbus',[BusController::class,'filterbus'])->name('filterbus');
 Route::post('delete-bus',[BusController::class,'destroy'])->name('delete-bus');
 Route::post('show-hide-bus',[BusController::class,'showHideBus'])->name('show-hide-bus');
+Route::post('change-status-bus-by-date',[BusController::class,'deactivateByDate'])->name('change-status-bus-by-date');
 
 // ------------ city api -------------------//
 Route::resource('cities',CityController::class)->names('cities');

@@ -10,6 +10,7 @@ use App\Models\DropPoints;
 use App\Models\DatePrice;
 use App\Models\ConfirmedSeat;
 use App\Models\Payment;
+use App\Models\BusInactiveDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use DB;
@@ -35,7 +36,7 @@ class BusController extends Controller
     {
         if(request()->has('agent_id')){
             if (request()->from && request()->to) {
-                
+                $inactives = BusInactiveDate::where('date',request()->date)->pluck('bus_id')->toArray();
                 $bus = DB::table('buses')
                     ->join('routes', 'buses.id', '=', 'routes.bus_id')
                         ->where('routes.from', 'like', '%'.request()->from.'%')
@@ -49,6 +50,8 @@ class BusController extends Controller
                              ->where('date', '=', request()->date);
                     })->where('buses.status','=','A')
                     ->where('buses.agent_id','=',request()->agent_id)
+                    ->whereNotIn('buses.id',$inactives)
+                    ->whereNotIn('buses.agent_id',DB::table('agents')->where('status','0')->pluck('id')->toArray())
                     ->select('buses.id', 'buses.travels_name','buses.image','date_prices.seats_avail','pickup_points.last_pick','drop_points.last_drop','buses.agent_id','date_prices.price', 'routes.from', 'routes.to')
                     ->distinct('buses.id')
                     ->get();
@@ -66,7 +69,7 @@ class BusController extends Controller
             }
         }else{
             if (request()->from && request()->to) {
-                
+                $inactives = BusInactiveDate::where('date',request()->date)->pluck('bus_id')->toArray();
                 $bus = DB::table('buses')
                     ->join('routes', 'buses.id', '=', 'routes.bus_id')
                          ->where('routes.from', 'like', '%'.request()->from.'%')
@@ -77,8 +80,10 @@ class BusController extends Controller
                         ->where('drop_points.to', '=', request()->to)
                     ->join('date_prices', function ($join) {
                         $join->on('routes.id', '=', 'date_prices.route_id')
-                             ->where('date', '=', request()->date);
+                             ->where('date_prices.date', '=', request()->date);
                     })->where('buses.status','=','A')
+                    ->whereNotIn('buses.id',$inactives)
+                    ->whereNotIn('buses.agent_id',DB::table('agents')->where('status','0')->pluck('id')->toArray())
                     ->select('buses.id', 'buses.travels_name','buses.image','date_prices.seats_avail','pickup_points.last_pick','drop_points.last_drop','buses.agent_id','date_prices.price', 'routes.from', 'routes.to')
                     ->distinct('buses.id')
                     ->get();
@@ -251,6 +256,15 @@ class BusController extends Controller
             $busid = request()->bus_id;
             $bus = Bus::find($busid);
             if (!is_null($bus)) {
+                $seats = ConfirmedSeat::where('bus_id',$busid)
+                    ->where('user_type','0')
+                    ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
+                    ->get();
+
+                if(count($seats)>0)
+                {
+                    return response()->json(['flag'=>false, 'message'=>'Deletion suspended, Bus contains advanced booking for upcoming date and time!']); 
+                }
                 // -------- getting routes for date price
                 $routes = Routes::where('bus_id', $bus->id)->get();
                 $m = $routes->pluck('id');
@@ -284,7 +298,19 @@ class BusController extends Controller
             //     return response()->json(['flag'=>false, 'message'=>'status have only 2 values either A or D']); 
             // }
             $bus = Bus::find($request->bus_id);
-            if (!is_null($bus)) {   
+            if (!is_null($bus)) { 
+                if($request->status== 'D')
+                {
+                    $seats = ConfirmedSeat::where('bus_id',$request->bus_id)
+                        ->where('user_type','0')
+                        ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
+                        ->get();
+
+                    if(count($seats)>0)
+                    {
+                        return response()->json(['flag'=>false, 'message'=>'De-activation suspended, Bus contains advanced booking for upcoming date and time!']); 
+                    }
+                }  
                 $bus->status = $request->status;
                 $bus->save();
                 return response()->json(['flag'=>true, 'message'=>'status changes successfully','data'=>$bus]); 
@@ -293,6 +319,50 @@ class BusController extends Controller
             }
         }else{
             return response()->json(['flag'=>false, 'message'=>'buse_id and status are needed']); 
+        }
+    }
+
+    public function deactivateByDate(Request $request)
+    {
+        if ($request->bus_id && $request->date && $request->status) {
+            // if ($request->status != 'A' || $request->status != 'D' ) {
+            //     return response()->json(['flag'=>false, 'message'=>'status have only 2 values either A or D']); 
+            // }
+            $bus = Bus::find($request->bus_id);
+            if (!is_null($bus)) { 
+                if($request->status=='D')
+                {
+                    $seats = ConfirmedSeat::where('bus_id',$request->bus_id)
+                        ->where('user_type','0')
+                        ->where('confirmed_seats.date',$request->date)
+                        ->get();
+
+                    if(count($seats)>0)
+                    {
+                        return response()->json(['flag'=>false, 'message'=>'De-activation suspended, Bus contains advanced booking for given date!']); 
+                    }
+
+                    $obj = BusInactiveDate::firstOrCreate([
+                        'bus_id'=>$request->bus_id,
+                        'date'=>$request->date]);
+
+                    if ($obj->wasRecentlyCreated)
+                        return response()->json(['flag'=>true, 'message'=>'Successfully deactivated for date: '.$request->date,'data'=>$bus]); 
+                    else
+                        return response()->json(['flag'=>true, 'message'=>'Already deactivated for date: '.$request->date,'data'=>$bus]); 
+                }
+                $obj = BusInactiveDate::where('date',$request->date)->where('bus_id',$request->bus_id)->first();
+                if(!empty($obj))
+                {
+                    BusInactiveDate::where('date',$request->date)->where('bus_id',$request->bus_id)->delete();
+                    return response()->json(['flag'=>true, 'message'=>'Successfully activated for date: '.$request->date,'data'=>$bus]); 
+                }
+                return response()->json(['flag'=>true, 'message'=>'Already active for date: '.$request->date,'data'=>$bus]); 
+            }else{
+                return response()->json(['flag'=>false, 'message'=>'bus not found']); 
+            }
+        }else{
+            return response()->json(['flag'=>false, 'message'=>'buse_id, date and status are needed']); 
         }
     }
 

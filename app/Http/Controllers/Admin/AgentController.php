@@ -77,6 +77,7 @@ class AgentController extends Controller
         {
             $buses = $agent->buses->pluck('id')->toArray();
             $seats = ConfirmedSeat::whereIn('bus_id',$buses)
+                ->where('user_type','0')
                 ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
                 ->get();
             if(count($seats)>0)
@@ -176,6 +177,10 @@ class AgentController extends Controller
         if(count($agent->buses)>0)
             {
             $buses = $agent->buses->pluck('id')->toArray();
+            if(count($buses)>0)
+            {
+                return redirect()->back()->with('error','Deletion suspended, Found buses for given agent');
+            }
             $seats = ConfirmedSeat::whereIn('bus_id',$buses)
                 ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
                 ->get();
@@ -199,18 +204,18 @@ class AgentController extends Controller
     public function deleteAgentData(Agent $agent,$buses)
     {
         $status = BankDetail::where('agent_id',$agent->id)->delete();
-        if(!empty($buses))
-        {
-            $status = DropPoints::whereIn('bus_id',$buses)->delete();
-            $status = PickupPoints::whereIn('bus_id',$buses)->delete();
-            $routes = Routes::whereIn('bus_id',$buses)->get();
-            if(count($routes)>0)
-            {
-                $status = DatePrice::whereIn('route_id',$routes->pluck('id')->toArray())->delete();
-                $routes = Routes::whereIn('id',$routes->pluck('id')->toArray())->get();
-            }
-            $status = ConfirmedSeat::whereIn('bus_id',$buses)->delete();
-        }
+        // if(!empty($buses))
+        // {
+        //     $status = DropPoints::whereIn('bus_id',$buses)->delete();
+        //     $status = PickupPoints::whereIn('bus_id',$buses)->delete();
+        //     $routes = Routes::whereIn('bus_id',$buses)->get();
+        //     if(count($routes)>0)
+        //     {
+        //         $status = DatePrice::whereIn('route_id',$routes->pluck('id')->toArray())->delete();
+        //         $routes = Routes::whereIn('id',$routes->pluck('id')->toArray())->get();
+        //     }
+        //     $status = ConfirmedSeat::whereIn('bus_id',$buses)->delete();
+        // }
 
     }
 }

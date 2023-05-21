@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\DatePrice;
 use App\Models\Routes;
 use App\Models\Setting;
+use App\Models\BusInactiveDate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator; 
 use DB;
@@ -90,6 +91,11 @@ class ConfirmedSeatController extends Controller
             $error['message'] = $validator->errors()->first();
             return response()->json($error);
         }
+        /***** Check for inactive dates *****/
+        $inactive = BusInactiveDate::where('bus_id',$request->bus_id)->where('date',$request->date)->first();
+        if(!empty($inactive))
+            return response()->json(['status'=>false,'message'=>'Booking failed, Selected bus is inactive for given date!']);
+
         $mConfirmed = ConfirmedSeat::where('bus_id',$request->bus_id)->where('date',$request->date)->where('status','1')->where('payment_status','1')->pluck('seatNo')->toArray();
 
         $array = [];
@@ -143,7 +149,14 @@ class ConfirmedSeatController extends Controller
             'currency'        => 'INR'
         ];
 
-        $razorpayOrder = $rapi->order->create($razorpayOrderData);
+        try
+        {
+            $razorpayOrder = $rapi->order->create($razorpayOrderData);
+        }
+        catch(\Exception $e)
+        {
+            return response()->json(['status'=>false,'message'=>'Razorpay: '.$e->getMessage()]);
+        }
         /****Razorpay create order****/
 
         $cbookbus = new ConfirmedSeat();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Bus;
+use App\Models\ConfirmedSeat;
 use DataTables;
 use Session;
 
@@ -32,10 +33,42 @@ class BusController extends Controller
                     $btn = '<img src="'.storage_path().'app/'.$row->image.'" class="table-avatar"></img>';
                     return $btn;
                 })
-                ->rawColumns(['image'])
+            ->addColumn('action', function($row){
+                $btn = '';
+                if($row->status=='A')
+                    $btn = '<a href class="btn btn-sm btn-danger deleteModal" data-toggle="modal" data-type="D" data-target="#deleteAlert" data-id="'.$row->id.'">Delete</button></a>';
+                else
+                    $btn = '<a href class="btn btn-sm btn-success deleteModal" data-toggle="modal" data-type="A" data-target="#deleteAlert" data-id="'.$row->id.'">Recover</button></a>';
+                    return $btn;
+                })
+                ->rawColumns(['image','action'])
                 ->make(true);
         }
         return view('bus.index');
+    }
+
+    public function statusChange(Request $request,Bus $bus)
+    {
+        if(empty($request->status))
+            return redirect()->back()->with('error','Status field is required to perform this action!');
+
+        $msg = 'Bus Recovered successfully!';
+
+        if($request->status=='D')
+        {
+            $seats = ConfirmedSeat::where('bus_id',$bus->id)
+                ->where('user_type','0')
+                ->whereRaw('CAST(CONCAT(STR_TO_DATE(confirmed_seats.date,"%d-%b-%Y")," ",confirmed_seats.pick_time) AS DATETIME) >= "'.now().'"')
+                ->get();
+            if(count($seats)>0)
+            {
+                return redirect()->back()->with('error','Deletion suspended, Bus has confirmed tickets for upcoming Date and time');
+            }
+            $msg = 'Bus Deleted successfully!';
+        }
+
+        $bus->update(['status'=>$request->status]);
+        return redirect()->back()->with('success',$msg);
     }
 
     public function getCustomFilterData(Request $request)
